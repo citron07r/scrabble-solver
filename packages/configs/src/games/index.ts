@@ -1,4 +1,5 @@
 export * from './crossplay';
+export * from './duplicatEliptic';
 export * from './kelimelik';
 export * from './letterLeague';
 export * from './literaki';

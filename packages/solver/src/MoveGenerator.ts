@@ -104,7 +104,8 @@ export class MoveGenerator {
 
   private readonly digraphs: string[];
   private readonly blankScore: number;
-  private readonly rackSize: number;
+  private readonly maximumWordLength: number;
+  private maxPlacements = 0;
 
   // Single-tile placements are the only ones both passes can emit; multi-tile
   // placements determine their line, span, and anchor uniquely.
@@ -131,7 +132,7 @@ export class MoveGenerator {
     this.height = board.rowsCount;
     this.cellsCount = this.width * this.height;
     this.blankScore = config.blankScore;
-    this.rackSize = config.rackSize;
+    this.maximumWordLength = config.maximumWordLength;
     this.digraphs = config.twoCharacterTiles;
 
     const alphabet = config.alphabet;
@@ -232,6 +233,8 @@ export class MoveGenerator {
         ++this.rackTotal;
       }
     }
+
+    this.maxPlacements = Math.min(this.rackTotal, this.maximumWordLength);
 
     this.bonusType = new Uint8Array(this.cellsCount);
     this.bonusMult = new Int32Array(this.cellsCount);
@@ -382,7 +385,7 @@ export class MoveGenerator {
         this.anchorRightOpen = position + 1 >= this.lineLength || this.passFilled[this.lineBase + position + 1] === 0;
 
         let limit = 0;
-        const maxLimit = this.rackTotal - 1;
+        const maxLimit = this.maxPlacements - 1;
 
         for (let left = position - 1; left >= 0 && limit < maxLimit; --left) {
           const index = this.lineBase + left;
@@ -679,7 +682,7 @@ export class MoveGenerator {
   private placeAt(position: number, passIndex: number, ref: number, leftward: boolean): void {
     let arcIndex = ref >>> 1;
 
-    if (arcIndex === 0 || this.placedCount >= this.rackTotal) {
+    if (arcIndex === 0 || this.placedCount >= this.maxPlacements) {
       return;
     }
 
@@ -864,7 +867,7 @@ export class MoveGenerator {
 
     let points = mainScore * wordMultiplier + collisionsScore;
 
-    if (this.placedCount === this.rackSize) {
+    if (this.placedCount === this.maximumWordLength) {
       const bingo = this.config.bingo;
 
       if (isScoreBingo(bingo)) {

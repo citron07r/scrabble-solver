@@ -1,5 +1,6 @@
 export enum Game {
   Crossplay = 'crossplay',
+  DuplicatEliptic = 'duplicat-eliptic',
   Kelimelik = 'kelimelik',
   LetterLeague = 'letter-league',
   Literaki = 'literaki',

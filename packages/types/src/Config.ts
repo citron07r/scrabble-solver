@@ -109,6 +109,10 @@ export class Config {
     return typeof this.getTwoCharacterTileByPrefix(character) !== 'undefined';
   }
 
+  public get maximumWordLength(): number {
+    return this.config.maximumWordLength ?? this.config.rackSize;
+  }
+
   public get rackSize(): number {
     return this.config.rackSize;
   }

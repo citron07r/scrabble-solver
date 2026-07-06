@@ -13,6 +13,7 @@ export interface ConfigJson {
   bonuses: BonusJson[];
   game: Game;
   locale: Locale;
+  maximumWordLength?: number;
   name: string;
   rackSize: number;
   tiles: TileConfig[];
