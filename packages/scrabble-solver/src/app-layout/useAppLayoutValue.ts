@@ -28,7 +28,7 @@ export const useAppLayoutValue = () => {
   const config = useTypedSelector(selectConfig);
   const showCoordinates = useTypedSelector(selectShowCoordinates);
   const isTouchDevice = useIsTouchDevice();
-  const { isLessThanXs, isLessThanS, isLessThanM, isLessThanL, isLessThanXl } = useMediaQueries();
+  const { isLessThanS, isLessThanM, isLessThanL, isLessThanXl } = useMediaQueries();
   const columns = useColumns();
   const isBoardFullWidth = isLessThanM;
   const showResultCandidatePicker = isLessThanL;
@@ -38,8 +38,7 @@ export const useAppLayoutValue = () => {
   const logoHeight = isLessThanL ? LOGO_HEIGHT_SMALL : LOGO_HEIGHT;
   const navHeight = 2 * NAV_PADDING + logoHeight;
   const solverHeight = viewportHeight - navHeight;
-  const solverWidth = viewportWidth;
-  const maxBoardWidth = solverWidth - columnWidth - (showColumn ? componentsSpacing : 0) - 2 * componentsSpacing;
+  const maxBoardWidth = viewportWidth - columnWidth - (showColumn ? componentsSpacing : 0) - 2 * componentsSpacing;
   const tileSize = Math.min((maxBoardWidth - 2 * BORDER_WIDTH) / config.rackSize, RACK_TILE_SIZE_MAX);
   const candidatePickerHeight = showResultCandidatePicker ? BUTTON_HEIGHT + componentsSpacing : 0;
   const bottomContainerHeight = candidatePickerHeight + tileSize + 2 * componentsSpacing;
@@ -104,7 +103,7 @@ export const useAppLayoutValue = () => {
     showKeyMap: !isTouchDevice,
     showResultsInModal,
     showShortNav: isLessThanS,
-    showTilePoints: !isLessThanXs,
+    showTilePoints: true,
     tileSize,
   };
 };
