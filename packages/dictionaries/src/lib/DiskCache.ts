@@ -2,6 +2,7 @@ import { Gaddag } from '@kamilmielnik/gaddag';
 import { logger } from '@scrabble-solver/logger';
 import { type Locale } from '@scrabble-solver/types';
 import fs from 'fs';
+import path from 'path';
 
 import { CACHE_STALE_THRESHOLD, OUTPUT_DIRECTORY } from '../constants';
 import type { Cache } from '../types';
@@ -70,6 +71,7 @@ export class DiskCache implements Cache<Locale, Gaddag> {
 
   public async set(locale: Locale, gaddag: Gaddag): Promise<void> {
     const filepath = getDictionaryFilepath(locale, this.directory);
+    await fs.promises.mkdir(path.dirname(filepath), { recursive: true });
     await fs.promises.writeFile(filepath, gaddag.serialize());
     // Serialized-trie cache from before the GADDAG migration - remove this in #437
     await fs.promises.rm(getLegacyDictionaryFilepath(locale, this.directory), { force: true });

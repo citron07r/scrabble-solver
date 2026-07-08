@@ -14,15 +14,19 @@ export const fetch = async (input: RequestInfo | URL, init?: RequestInit): Promi
     return response;
   }
 
-  try {
-    const json = await response.json();
+  const json = await parseJsonSafely(response);
 
-    if (isError(json)) {
-      throw new Error(json.message);
-    }
-  } finally {
-    // do nothing
+  if (isError(json)) {
+    throw new Error(json.message);
   }
 
   throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+};
+
+const parseJsonSafely = async (response: Response): Promise<unknown> => {
+  try {
+    return await response.json();
+  } catch {
+    return undefined;
+  }
 };

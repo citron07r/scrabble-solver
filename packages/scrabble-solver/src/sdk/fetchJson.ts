@@ -5,5 +5,10 @@ export const fetchJson = async <T>(input: RequestInfo | URL, init?: RequestInit)
   headers.set('Content-Type', 'application/json');
 
   const response = await fetch(input, { ...init, headers });
-  return response.json();
+
+  try {
+    return await response.json();
+  } catch {
+    throw new Error('Invalid JSON response');
+  }
 };
