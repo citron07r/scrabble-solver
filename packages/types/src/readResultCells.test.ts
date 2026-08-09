@@ -68,6 +68,18 @@ describe('readCells', () => {
   });
 });
 
+describe('readCells - malformed input', () => {
+  /** This JSON crosses a process boundary, so a bad coordinate must not throw. */
+  it.each([
+    { x: -1, y: 0 },
+    { x: 0, y: -1 },
+    { x: -3, y: -3 },
+  ])('returns no cells for a negative start ($x, $y)', ({ x, y }) => {
+    const board = createBoard();
+    expect(readCells(createResultJson({ tiles: ['a', 'b'], x, y }), board)).toEqual([]);
+  });
+});
+
 describe('readCollisions', () => {
   it('reads the perpendicular word crossing a placed tile', () => {
     const board = createBoard(['     ', '  a  ', '   d ', '  c  ', '     ']);

@@ -41,7 +41,11 @@ export async function getGaddag(locale: Locale): Promise<Gaddag | undefined> {
     return gaddag;
   } catch {
     delete deserializedDictionaries[locale];
-    await deleteDictionary(locale);
+
+    // The cleanup is best-effort: letting it reject would turn "no dictionary,
+    // fall back to the server" into a failed request.
+    await deleteDictionary(locale).catch(() => undefined);
+
     return undefined;
   }
 }

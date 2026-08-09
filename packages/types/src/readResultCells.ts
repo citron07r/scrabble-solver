@@ -10,7 +10,9 @@ export function readCells(json: ResultJson, board: Board): Cell[] {
   let placedIndex = 0;
   let { x, y } = json;
 
-  while (y < board.rowsCount && x < board.columnsCount) {
+  // Lower bounds too: this JSON arrives from the server or the worker, and a
+  // negative coordinate would index a missing row and throw rather than decode.
+  while (x >= 0 && y >= 0 && y < board.rowsCount && x < board.columnsCount) {
     const boardCell = board.rows[y][x];
 
     if (boardCell.isFilled()) {
