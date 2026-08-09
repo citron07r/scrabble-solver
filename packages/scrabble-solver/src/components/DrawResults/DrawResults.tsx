@@ -3,7 +3,7 @@ import { type FunctionComponent } from 'react';
 import { useDebounce } from 'use-debounce';
 
 import { LOCALE_FEATURES } from '@/i18n';
-import { GeoAlt } from '@/icons';
+import { GeoAlt, OneTwoThree } from '@/icons';
 import {
   selectAreResultsOutdated,
   selectConfig,
@@ -63,7 +63,10 @@ export const DrawResults: FunctionComponent<Props> = ({ callbacks, className }) 
         >
           <GeoAlt className={styles.coordinatesIcon} />
         </span>
-        <span className={classNames(styles.cell, styles.points)}>{translate('common.points')}</span>
+        <span aria-label={translate('common.points')} className={classNames(styles.cell, styles.points)}>
+          <OneTwoThree className={styles.pointsIcon} />
+          <span className={styles.pointsLabel}>{translate('common.points')}</span>
+        </span>
         <span className={classNames(styles.cell, styles.left)}>{translate('duplicatCompletiv.column.left')}</span>
       </div>
 

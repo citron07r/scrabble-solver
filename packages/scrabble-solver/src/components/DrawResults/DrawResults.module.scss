@@ -114,7 +114,7 @@ $row-padding-horizontal: calc(var(--spacing--m) + var(--spacing--s));
 @container draw-results (max-width: 34rem) {
   .header,
   .row {
-    grid-template-columns: 4.25rem minmax(0, 1fr) 2rem 4.5rem 3.25rem;
+    grid-template-columns: 4.5rem minmax(0, 1fr) 2rem 4.5rem 3.25rem;
     column-gap: var(--spacing--s);
     padding-inline: var(--spacing--m);
   }
@@ -128,12 +128,38 @@ $row-padding-horizontal: calc(var(--spacing--m) + var(--spacing--s));
 @container draw-results (max-width: 23rem) {
   .header,
   .row {
-    grid-template-columns: 4.25rem minmax(0, 1fr) 2rem 4.5rem;
+    grid-template-columns: 4.5rem minmax(0, 1fr) 2rem 4.5rem;
+    column-gap: var(--spacing--m);
   }
 
   /* `.cell` carries the ellipsis mixin's own `display`, so this has to outrank it. */
   .cell.left {
     display: none;
+  }
+}
+
+/**
+ * The last width where a label still costs less than it explains. POINTS drops
+ * to the numeric icon `Results` uses for the same column, which frees the 32px
+ * that keeps eight-letter words - SUZERAIN, ZEBRINAS - from truncating here.
+ * The gutter narrows again too: the draw column is sized to its own label, so
+ * that gap is what separates "LETTER 7" from "WORD", but a word left unreadable
+ * costs more than two headers sitting close.
+ */
+@container draw-results (max-width: 20rem) {
+  .header,
+  .row {
+    grid-template-columns: 4.5rem minmax(0, 1fr) 2rem 2.5rem;
+    column-gap: var(--spacing--s);
+  }
+
+  /* Descendant selectors so these outrank the defaults declared further down. */
+  .points .pointsLabel {
+    display: none;
+  }
+
+  .points .pointsIcon {
+    display: inline-block;
   }
 }
 
@@ -175,10 +201,16 @@ $row-padding-horizontal: calc(var(--spacing--m) + var(--spacing--s));
 }
 
 /** Mirrors the pin the Results header uses, so the column reads the same way. */
-.coordinatesIcon {
+.coordinatesIcon,
+.pointsIcon {
   width: var(--results--icon--size);
   height: var(--results--icon--size);
   vertical-align: middle;
+}
+
+/** Only stands in for the label on the narrowest panel; see the container query. */
+.pointsIcon {
+  display: none;
 }
 
 /** Numbers are right-aligned so magnitudes line up when scanning the column. */
