@@ -33,7 +33,7 @@
   "duplicatCompletiv": "Duplicat Completiv",
   "duplicatCompletiv.baseline": "Ohne Nachziehen: {{move}}",
   "duplicatCompletiv.blank": "{{character}}, mit einem Joker gelegt",
-  "duplicatCompletiv.column.draw": "Gezogen",
+  "duplicatCompletiv.column.draw": "Stein 7",
   "duplicatCompletiv.column.left": "Im Beutel",
   "duplicatCompletiv.empty-state.no-candidates": "Der Beutel ist leer - es gibt nichts mehr zu ziehen.",
   "duplicatCompletiv.empty-state.uninitialized": "Gib deine sechs festen Steine ein; der siebte wird aus dem Beutel gezogen.",

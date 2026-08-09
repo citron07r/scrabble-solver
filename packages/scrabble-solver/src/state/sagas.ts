@@ -147,6 +147,9 @@ function* onReset(): AnyGenerator {
   yield put(dictionarySlice.actions.reset());
   yield put(drawsSlice.actions.reset());
   yield put(rackSlice.actions.reset());
+  // rackDefaultState is fixed at module load from the game that was persisted
+  // then, so it can be the wrong length for the game selected now.
+  yield* resetRack();
   yield put(resultsSlice.actions.reset());
   yield put(solveSlice.actions.reset());
   yield put(verifySlice.actions.submit());

@@ -33,7 +33,7 @@
   "duplicatCompletiv": "Duplicat Completiv",
   "duplicatCompletiv.baseline": "Çekiliş olmadan: {{move}}",
   "duplicatCompletiv.blank": "{{character}}, joker ile oynandı",
-  "duplicatCompletiv.column.draw": "Çekilen",
+  "duplicatCompletiv.column.draw": "7. harf",
   "duplicatCompletiv.column.left": "Torbada",
   "duplicatCompletiv.empty-state.no-candidates": "Torba boş - çekilecek taş kalmadı.",
   "duplicatCompletiv.empty-state.uninitialized": "Sabit altı taşınızı girin; yedincisi torbadan çekilir.",

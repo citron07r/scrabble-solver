@@ -1,7 +1,7 @@
 import { BLANK } from '@scrabble-solver/constants';
 import { Board, Result, type ResultJson } from '@scrabble-solver/types';
 
-import { pickBestDrawResult } from '@/lib';
+import { pickBestDrawResults } from '@/lib';
 import { solveDrawsLocally } from '@/solver-worker';
 import { type DrawCandidate, type DrawsResult, type SolveDrawsRequestPayload } from '@/types';
 
@@ -32,7 +32,10 @@ export const solveDraws = async (payload: SolveDrawsRequestPayload): Promise<Dra
 
     return {
       baseline: toResult(baseline, board),
-      draws: draws.map(({ result, ...candidate }) => ({ ...candidate, result: toResult(result, board) })),
+      draws: draws.map(({ results, ...candidate }) => ({
+        ...candidate,
+        results: results.map((result) => Result.fromJson(result, board)),
+      })),
     };
   }
 
@@ -42,7 +45,12 @@ export const solveDraws = async (payload: SolveDrawsRequestPayload): Promise<Dra
     baseline: toResult(pickHighestScoring(resultsByCharacter.get(NO_DRAW) ?? []), board),
     draws: payload.candidates.map((candidate) => {
       const results = resultsByCharacter.get(toDrawnCharacter(candidate)) ?? [];
-      return { ...candidate, result: toResult(pickBestDrawResult(results, candidate, payload.characters), board) };
+      return {
+        ...candidate,
+        results: pickBestDrawResults(results, candidate, payload.characters).map((result) =>
+          Result.fromJson(result, board),
+        ),
+      };
     }),
   };
 };

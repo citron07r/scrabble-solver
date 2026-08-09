@@ -4,7 +4,7 @@ import { BLANK } from '@scrabble-solver/constants';
 import { solve } from '@scrabble-solver/solver';
 import { Board, type ResultJson, Tile } from '@scrabble-solver/types';
 
-import { pickBestDrawResult } from '@/lib';
+import { pickBestDrawResults } from '@/lib';
 import { type DrawResultJson, type SolveDrawsRequestPayload, type SolveDrawsResultJson } from '@/types';
 
 /**
@@ -43,7 +43,7 @@ export const solveDraws = async (
     }
 
     const results = candidate.isBlank ? (blankResults ?? []) : solveWithDraw(candidate.character);
-    draws.push({ ...candidate, result: pickBestDrawResult(results, candidate, characters) });
+    draws.push({ ...candidate, results: pickBestDrawResults(results, candidate, characters) });
   }
 
   const baselineResults = characters.length > 0 ? solve(gaddag, config, board, toTiles(characters)) : [];

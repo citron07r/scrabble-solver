@@ -86,7 +86,7 @@ $row-padding-horizontal: calc(var(--spacing--m) + var(--spacing--s));
 .header,
 .row {
   display: grid;
-  grid-template-columns: 3.25rem minmax(0, 1fr) 3.5rem 4rem 3.5rem;
+  grid-template-columns: 5rem minmax(0, 1fr) 3.5rem 4rem 3.5rem;
   align-items: center;
   column-gap: var(--spacing--m);
   width: 100%;
@@ -94,7 +94,7 @@ $row-padding-horizontal: calc(var(--spacing--m) + var(--spacing--s));
   padding-inline: $row-padding-horizontal;
 
   @include media('<m') {
-    grid-template-columns: 3.25rem minmax(0, 1fr) 4rem 3.5rem;
+    grid-template-columns: 5rem minmax(0, 1fr) 4rem 3.5rem;
 
     .coordinates {
       display: none;

@@ -10,9 +10,9 @@ export interface DrawCandidate {
   remainingCount: number;
 }
 
-/** The best move a candidate enables, or null when the candidate is unplayable. */
+/** Every top-scoring move a candidate enables; empty when it enables none. */
 export interface DrawResultJson extends DrawCandidate {
-  result: ResultJson | null;
+  results: ResultJson[];
 }
 
 export interface SolveDrawsResultJson {

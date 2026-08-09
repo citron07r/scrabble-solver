@@ -33,7 +33,7 @@
   "duplicatCompletiv": "Duplicat Completiv",
   "duplicatCompletiv.baseline": "Sans pioche : {{move}}",
   "duplicatCompletiv.blank": "{{character}}, jouée par un joker",
-  "duplicatCompletiv.column.draw": "Pioche",
+  "duplicatCompletiv.column.draw": "Lettre 7",
   "duplicatCompletiv.column.left": "Dans le sac",
   "duplicatCompletiv.empty-state.no-candidates": "Le sac est vide - il n'y a plus rien à piocher.",
   "duplicatCompletiv.empty-state.uninitialized": "Saisissez vos six tuiles fixes ; la septième est piochée dans le sac.",

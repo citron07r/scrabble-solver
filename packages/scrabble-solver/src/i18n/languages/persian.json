@@ -33,7 +33,7 @@
   "duplicatCompletiv": "Duplicat Completiv",
   "duplicatCompletiv.baseline": "بدون برداشتن کاشی: {{move}}",
   "duplicatCompletiv.blank": "{{character}}، با ژوکر بازی شده",
-  "duplicatCompletiv.column.draw": "برداشته‌شده",
+  "duplicatCompletiv.column.draw": "حرف هفتم",
   "duplicatCompletiv.column.left": "در کیسه",
   "duplicatCompletiv.empty-state.no-candidates": "کیسه خالی است - چیزی برای برداشتن باقی نمانده است.",
   "duplicatCompletiv.empty-state.uninitialized": "شش کاشی ثابت خود را وارد کنید؛ کاشی هفتم از کیسه برداشته می‌شود.",

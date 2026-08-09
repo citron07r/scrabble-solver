@@ -109,8 +109,8 @@ export const DrawResults: FunctionComponent<Props> = ({ callbacks, className }) 
                 </p>
 
                 <ul className={styles.list} dir={direction}>
-                  {rows.map((row) => (
-                    <DrawRow callbacks={callbacks} key={`${row.character}-${row.isBlank}`} row={row} />
+                  {rows.map((row, index) => (
+                    <DrawRow callbacks={callbacks} key={`${row.character}-${row.isBlank}-${index}`} row={row} />
                   ))}
                 </ul>
               </div>

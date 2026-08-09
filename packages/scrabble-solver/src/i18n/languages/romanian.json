@@ -33,7 +33,7 @@
   "duplicatCompletiv": "Duplicat Completiv",
   "duplicatCompletiv.baseline": "Fara extragere: {{move}}",
   "duplicatCompletiv.blank": "{{character}}, jucata cu joker",
-  "duplicatCompletiv.column.draw": "Extragere",
+  "duplicatCompletiv.column.draw": "Litera 7",
   "duplicatCompletiv.column.left": "In sac",
   "duplicatCompletiv.empty-state.no-candidates": "Sacul este gol - nu mai este nimic de extras.",
   "duplicatCompletiv.empty-state.uninitialized": "Introdu cele sase litere fixe; a saptea este extrasa din sac.",

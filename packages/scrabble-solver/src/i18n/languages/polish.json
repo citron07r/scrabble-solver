@@ -33,7 +33,7 @@
   "duplicatCompletiv": "Duplicat Completiv",
   "duplicatCompletiv.baseline": "Bez dobrania: {{move}}",
   "duplicatCompletiv.blank": "{{character}}, zagrane blankiem",
-  "duplicatCompletiv.column.draw": "Dobranie",
+  "duplicatCompletiv.column.draw": "Litera 7",
   "duplicatCompletiv.column.left": "W woreczku",
   "duplicatCompletiv.empty-state.no-candidates": "Woreczek jest pusty - nie ma czego dobierać.",
   "duplicatCompletiv.empty-state.uninitialized": "Wpisz swoje sześć stałych płytek; siódma jest dobierana z woreczka.",

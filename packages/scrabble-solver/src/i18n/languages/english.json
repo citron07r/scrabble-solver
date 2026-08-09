@@ -33,7 +33,7 @@
   "duplicatCompletiv": "Duplicat Completiv",
   "duplicatCompletiv.baseline": "Without a draw: {{move}}",
   "duplicatCompletiv.blank": "{{character}}, played by a blank",
-  "duplicatCompletiv.column.draw": "Draw",
+  "duplicatCompletiv.column.draw": "Letter 7",
   "duplicatCompletiv.column.left": "In bag",
   "duplicatCompletiv.empty-state.no-candidates": "The bag is empty - there is nothing left to draw.",
   "duplicatCompletiv.empty-state.uninitialized": "Enter your six fixed tiles; the seventh is drawn from the bag.",

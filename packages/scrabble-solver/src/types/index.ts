@@ -77,7 +77,7 @@ export interface GroupedResults {
 }
 
 export interface DrawResult extends DrawCandidate {
-  result: Result | null;
+  results: Result[];
 }
 
 export interface DrawsResult {
@@ -85,8 +85,9 @@ export interface DrawsResult {
   draws: DrawResult[];
 }
 
-export interface DrawRow extends DrawResult {
+export interface DrawRow extends DrawCandidate {
   coordinates: string;
+  result: Result | null;
 }
 
 export type TranslationKey =

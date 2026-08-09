@@ -4,27 +4,32 @@ import { type ResultJson } from '@scrabble-solver/types';
 import { type DrawCandidate } from '@/types';
 
 /**
- * The highest-scoring move that could not have been played without the drawn
+ * Every highest-scoring move that could not have been played without the drawn
  * tile. A move the fixed rack already affords says nothing about the draw, so it
  * is rejected even though the solver returns it.
  *
- * Ties keep the first result, preserving the solver's deterministic ordering.
+ * All moves tied on the top score are returned, not just one: two different
+ * words can reach the same score from the same draw, and hiding either would
+ * misrepresent what that draw is worth. Order follows the solver's
+ * deterministic enumeration.
  */
-export const pickBestDrawResult = (
+export const pickBestDrawResults = (
   results: ResultJson[],
   candidate: DrawCandidate,
   fixedCharacters: string[],
-): ResultJson | null => {
+): ResultJson[] => {
   const fixedCount = countInRack(fixedCharacters, candidate);
-  let best: ResultJson | null = null;
+  let best: ResultJson[] = [];
 
   for (const result of results) {
     if (countInResult(result, candidate) <= fixedCount) {
       continue;
     }
 
-    if (!best || result.points > best.points) {
-      best = result;
+    if (best.length === 0 || result.points > best[0].points) {
+      best = [result];
+    } else if (result.points === best[0].points) {
+      best.push(result);
     }
   }
 

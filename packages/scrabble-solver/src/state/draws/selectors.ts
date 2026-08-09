@@ -13,19 +13,19 @@ export const selectDrawsBaseline = createSelector([selectDraws], (draws) => draw
 const selectDrawsResults = createSelector([selectDraws], (draws) => draws.results);
 
 /**
- * Highest-scoring draw first. Candidates that enable no move sink to the bottom
- * rather than disappearing - "this draw is useless" is an answer worth seeing.
+ * One row per move, not per candidate: a draw can reach its best score with more
+ * than one word, and every one of them belongs in the list. A candidate that
+ * enables nothing still gets a row, so "this draw is useless" stays visible.
  */
-const selectSortedDrawResults = createSelector([selectDrawsResults], (results) => {
-  return results ? [...results].sort((a, b) => (b.result?.points ?? -1) - (a.result?.points ?? -1)) : undefined;
-});
-
 export const selectDrawRows = createSelector(
-  [selectSortedDrawResults, selectShowCoordinates],
-  (results, showCoordinates): DrawRow[] | undefined => {
-    return results?.map((draw) => ({
-      ...draw,
-      coordinates: draw.result ? getCoordinates(draw.result, showCoordinates) : '',
-    }));
+  [selectDrawsResults, selectShowCoordinates],
+  (draws, showCoordinates): DrawRow[] | undefined => {
+    const rows: DrawRow[] | undefined = draws?.flatMap<DrawRow>(({ results, ...candidate }) =>
+      results.length === 0
+        ? [{ ...candidate, coordinates: '', result: null }]
+        : results.map((result) => ({ ...candidate, coordinates: getCoordinates(result, showCoordinates), result })),
+    );
+
+    return rows?.sort((a, b) => (b.result?.points ?? -1) - (a.result?.points ?? -1));
   },
 );
