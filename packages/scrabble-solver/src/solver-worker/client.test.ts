@@ -1,6 +1,8 @@
 import { type ResultJson } from '@scrabble-solver/types';
 import { afterAll, beforeEach, describe, expect, it } from 'bun:test';
 
+import { type SolveDrawsResultJson } from '../types';
+
 import type * as clientModule from './client';
 import { type SolverWorkerRequest, type SolverWorkerResponse } from './messages';
 
@@ -51,7 +53,10 @@ const { prefetchDictionary, solveDrawsLocally, solveLocally, verifyLocally }: ty
 const solvePayload = { board: [], characters: [], game: 'scrabble', locale: 'en-US' } as never;
 const solveDrawsPayload = { board: [], candidates: [], characters: [], game: 'scrabble', locale: 'en-US' } as never;
 const verifyPayload = { board: [], game: 'scrabble', locale: 'en-US' } as never;
-const drawResults = [{ character: 't', isBlank: false, remainingCount: 6, result: null }];
+const drawResults: SolveDrawsResultJson = {
+  baseline: createResults('ab')[0],
+  draws: [{ character: 't', isBlank: false, remainingCount: 6, results: createResults('tab') }],
+};
 
 describe('solver worker client', () => {
   beforeEach(() => {
