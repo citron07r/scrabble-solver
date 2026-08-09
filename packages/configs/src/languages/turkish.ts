@@ -1,6 +1,6 @@
 import { Config, Locale } from '@scrabble-solver/types';
 
-import { duplicatEliptic, kelimelik, scrabble } from '../games';
+import { duplicatCompletiv, duplicatEliptic, kelimelik, scrabble } from '../games';
 
 const turkishTiles = [
   { character: 'a', count: 12, score: 1 },
@@ -48,6 +48,12 @@ export const turkishKelimelik = new Config({
 
 export const turkishScrabble = new Config({
   ...scrabble,
+  locale: Locale.TR_TR,
+  tiles: turkishTiles,
+});
+
+export const turkishDuplicatCompletiv = new Config({
+  ...duplicatCompletiv,
   locale: Locale.TR_TR,
   tiles: turkishTiles,
 });

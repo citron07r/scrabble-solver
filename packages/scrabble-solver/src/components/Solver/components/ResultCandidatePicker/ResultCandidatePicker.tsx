@@ -8,7 +8,7 @@ import {
   selectAreResultsOutdated,
   selectSolveIsLoading,
   selectLocale,
-  selectProcessedResults,
+  selectNavigableResults,
   selectResultCandidate,
   useTranslate,
   useTypedSelector,
@@ -30,7 +30,7 @@ export const ResultCandidatePicker: FunctionComponent<Props> = ({ className, onR
   const locale = useTypedSelector(selectLocale);
   const isLoading = useTypedSelector(selectSolveIsLoading);
   const isOutdated = useTypedSelector(selectAreResultsOutdated);
-  const results = useTypedSelector(selectProcessedResults);
+  const results = useTypedSelector(selectNavigableResults);
   const resultCandidate = useTypedSelector(selectResultCandidate);
   const index = resultCandidate && results ? results.findIndex((result) => result.id === resultCandidate.id) : -1;
   const disabled = isOutdated || !resultCandidate;

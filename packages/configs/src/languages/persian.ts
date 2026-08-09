@@ -1,6 +1,6 @@
 import { Config, Locale } from '@scrabble-solver/types';
 
-import { duplicatEliptic, scrabble } from '../games';
+import { duplicatCompletiv, duplicatEliptic, scrabble } from '../games';
 
 const persianTiles = [
   { character: 'ا', count: 12, score: 1 },
@@ -45,6 +45,12 @@ export const persianDuplicatEliptic = new Config({
 
 export const persianScrabble = new Config({
   ...scrabble,
+  locale: Locale.FA_IR,
+  tiles: persianTiles,
+});
+
+export const persianDuplicatCompletiv = new Config({
+  ...duplicatCompletiv,
   locale: Locale.FA_IR,
   tiles: persianTiles,
 });

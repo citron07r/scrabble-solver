@@ -1,6 +1,8 @@
 import { type Result } from '@scrabble-solver/types';
 import { type FunctionComponent, type SVGAttributes } from 'react';
 
+import { type DrawCandidate } from './api';
+
 export type Comparator<T> = (a: T, B: T) => number;
 
 export type AutoGroupTiles = 'left' | 'right' | null;
@@ -74,6 +76,19 @@ export interface GroupedResults {
   other: Result[];
 }
 
+export interface DrawResult extends DrawCandidate {
+  result: Result | null;
+}
+
+export interface DrawsResult {
+  baseline: Result | null;
+  draws: DrawResult[];
+}
+
+export interface DrawRow extends DrawResult {
+  coordinates: string;
+}
+
 export type TranslationKey =
   | 'cell.enter-word'
   | 'cell.filter-cell.exclude'
@@ -106,6 +121,15 @@ export type TranslationKey =
   | 'dictionary.empty-state.uninitialized'
   | 'dictionary.input.placeholder'
   | 'dictionary.input.title'
+  | 'duplicatCompletiv'
+  | 'duplicatCompletiv.baseline'
+  | 'duplicatCompletiv.blank'
+  | 'duplicatCompletiv.column.draw'
+  | 'duplicatCompletiv.column.left'
+  | 'duplicatCompletiv.empty-state.no-candidates'
+  | 'duplicatCompletiv.empty-state.uninitialized'
+  | 'duplicatCompletiv.empty-state.unsupported'
+  | 'duplicatCompletiv.no-move'
   | 'empty-state.error'
   | 'empty-state.info'
   | 'empty-state.success'

@@ -4,6 +4,7 @@ export { Board } from './Board';
 export { Button } from './Button';
 export { Dictionary } from './Dictionary';
 export { DictionaryInput } from './DictionaryInput';
+export { DrawResults } from './DrawResults';
 export { EmptyState } from './EmptyState';
 export { IconButton } from './IconButton';
 export { Key } from './Key';

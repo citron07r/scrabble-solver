@@ -1,0 +1,160 @@
+@use 'styles/mixins' as *;
+
+$row-padding-horizontal: calc(var(--spacing--m) + var(--spacing--s));
+
+.drawResults {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color--background--element);
+  border: var(--border);
+  border-radius: var(--border--radius);
+}
+
+.emptyState {
+  flex: 1;
+}
+
+.content {
+  flex: 1;
+  position: relative;
+  height: 100%;
+}
+
+.listContainer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.list {
+  @include list-reset;
+  @include scrollbars;
+
+  flex: 1;
+  overflow-y: auto;
+}
+
+.header {
+  position: relative;
+  z-index: 1;
+  text-transform: uppercase;
+  background-color: var(--color--background);
+  border-bottom: var(--border);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+.baseline {
+  @include ellipsis;
+
+  margin: 0;
+  padding: var(--spacing--s) $row-padding-horizontal;
+  color: var(--color--foreground--secondary);
+  border-bottom: var(--border);
+}
+
+.row {
+  @include button-reset;
+
+  user-select: none;
+  cursor: pointer;
+  font-weight: 400;
+  text-align: start;
+
+  &:focus,
+  &:hover {
+    &:not(:disabled) {
+      background-color: var(--color--primary);
+      color: var(--color--primary--opposite);
+    }
+  }
+
+  &.empty {
+    color: var(--color--inactive);
+    cursor: default;
+  }
+}
+
+/**
+ * Header and rows share one grid definition so their columns cannot drift apart
+ * when a label is wider than the values below it. Declared after .row so the
+ * padding survives button-reset.
+ */
+.header,
+.row {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr) 3.5rem 4rem 3.5rem;
+  align-items: center;
+  column-gap: var(--spacing--m);
+  width: 100%;
+  height: var(--results--item--height);
+  padding-inline: $row-padding-horizontal;
+
+  @include media('<m') {
+    grid-template-columns: 3.25rem minmax(0, 1fr) 4rem 3.5rem;
+
+    .coordinates {
+      display: none;
+    }
+  }
+
+  @include media('<xs') {
+    column-gap: var(--spacing--s);
+    padding-inline: var(--spacing--m);
+  }
+}
+
+.cell {
+  @include ellipsis;
+
+  min-width: 0;
+}
+
+.draw {
+  display: flex;
+  align-items: center;
+}
+
+.drawTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  padding: 0 var(--spacing--s);
+  font-weight: bold;
+  line-height: 1.5;
+  border: var(--border);
+  border-radius: var(--border--radius);
+}
+
+/** A letter with no copies left in the bag, so it can only arrive as a blank. */
+.blankTile {
+  font-weight: 400;
+  border-style: dashed;
+}
+
+.word {
+  text-transform: uppercase;
+}
+
+.coordinates {
+  text-align: end;
+}
+
+/** Numbers are right-aligned so magnitudes line up when scanning the column. */
+.points {
+  font-weight: bold;
+  text-align: end;
+}
+
+.left {
+  text-align: end;
+}
+
+.solveButton {
+  display: block;
+  margin: var(--spacing--xl) auto 0;
+}

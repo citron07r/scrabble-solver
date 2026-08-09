@@ -3,9 +3,16 @@ import { type FunctionComponent, memo, useEffect, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { useAppLayout } from '@/app-layout';
-import { Button, Dictionary, Modal, Results } from '@/components';
+import { Button, Dictionary, DrawResults, Modal, Results } from '@/components';
 import { Check, EyeFill } from '@/icons';
-import { resultsSlice, selectProcessedResults, selectResultCandidate, useTranslate, useTypedSelector } from '@/state';
+import {
+  resultsSlice,
+  selectIsDuplicatCompletiv,
+  selectNavigableResults,
+  selectResultCandidate,
+  useTranslate,
+  useTypedSelector,
+} from '@/state';
 
 import styles from './ResultsModal.module.scss';
 
@@ -19,7 +26,8 @@ const ResultsModalBase: FunctionComponent<Props> = ({ className, isOpen, onClose
   const dispatch = useDispatch();
   const translate = useTranslate();
   const { showResultsInModal } = useAppLayout();
-  const results = useTypedSelector(selectProcessedResults);
+  const results = useTypedSelector(selectNavigableResults);
+  const isDuplicatCompletiv = useTypedSelector(selectIsDuplicatCompletiv);
   const resultCandidate = useTypedSelector(selectResultCandidate);
   const index = results ? results.findIndex((result) => result.id === resultCandidate?.id) : -1;
   const highlightedIndex = index === -1 ? undefined : index;
@@ -85,11 +93,15 @@ const ResultsModalBase: FunctionComponent<Props> = ({ className, isOpen, onClose
         </>
       }
       isOpen={isOpen}
-      title={translate('results')}
+      title={translate(isDuplicatCompletiv ? 'duplicatCompletiv' : 'results')}
       onClose={onClose}
     >
       <div className={styles.content}>
-        <Results callbacks={callbacks} className={styles.results} highlightedIndex={highlightedIndex} />
+        {isDuplicatCompletiv ? (
+          <DrawResults callbacks={callbacks} className={styles.results} />
+        ) : (
+          <Results callbacks={callbacks} className={styles.results} highlightedIndex={highlightedIndex} />
+        )}
         <Dictionary className={styles.dictionary} />
       </div>
     </Modal>

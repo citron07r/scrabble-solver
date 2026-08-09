@@ -1,6 +1,6 @@
 import { Config, Locale } from '@scrabble-solver/types';
 
-import { duplicatEliptic, scrabble } from '../games';
+import { duplicatCompletiv, duplicatEliptic, scrabble } from '../games';
 
 const germanTiles = [
   { character: 'a', count: 5, score: 1 },
@@ -42,6 +42,12 @@ export const germanDuplicatEliptic = new Config({
 
 export const germanScrabble = new Config({
   ...scrabble,
+  locale: Locale.DE_DE,
+  tiles: germanTiles,
+});
+
+export const germanDuplicatCompletiv = new Config({
+  ...duplicatCompletiv,
   locale: Locale.DE_DE,
   tiles: germanTiles,
 });

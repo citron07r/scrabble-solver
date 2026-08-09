@@ -1,6 +1,6 @@
 import { Config, Locale } from '@scrabble-solver/types';
 
-import { duplicatEliptic, scrabble } from '../games';
+import { duplicatCompletiv, duplicatEliptic, scrabble } from '../games';
 
 const frenchTiles = [
   { character: 'a', count: 9, score: 1 },
@@ -39,6 +39,12 @@ export const frenchDuplicatEliptic = new Config({
 
 export const frenchScrabble = new Config({
   ...scrabble,
+  locale: Locale.FR_FR,
+  tiles: frenchTiles,
+});
+
+export const frenchDuplicatCompletiv = new Config({
+  ...duplicatCompletiv,
   locale: Locale.FR_FR,
   tiles: frenchTiles,
 });

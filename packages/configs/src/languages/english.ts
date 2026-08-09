@@ -2,7 +2,16 @@
 
 import { Config, Locale } from '@scrabble-solver/types';
 
-import { crossplay, duplicatEliptic, letterLeague, literaki, scrabble, scrabbleDuel, superScrabble } from '../games';
+import {
+  duplicatCompletiv,
+  crossplay,
+  duplicatEliptic,
+  letterLeague,
+  literaki,
+  scrabble,
+  scrabbleDuel,
+  superScrabble,
+} from '../games';
 
 export const englishGbCrossplay = new Config({
   ...crossplay,
@@ -279,4 +288,16 @@ export const englishUsSuperScrabble = new Config({
     { character: 'y', count: 4, score: 4 },
     { character: 'z', count: 2, score: 10 },
   ],
+});
+
+export const englishGbDuplicatCompletiv = new Config({
+  ...duplicatCompletiv,
+  locale: Locale.EN_GB,
+  tiles: englishScrabbleTiles,
+});
+
+export const englishUsDuplicatCompletiv = new Config({
+  ...duplicatCompletiv,
+  locale: Locale.EN_US,
+  tiles: englishScrabbleTiles,
 });

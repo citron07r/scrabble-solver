@@ -5,11 +5,12 @@ import { BLANK } from '@scrabble-solver/constants';
 import { solve } from '@scrabble-solver/solver';
 import { Board, type Locale, Tile } from '@scrabble-solver/types';
 
-import { type SolveRequestPayload, type VerifyRequestPayload } from '@/types';
+import { type SolveDrawsRequestPayload, type SolveRequestPayload, type VerifyRequestPayload } from '@/types';
 
 import { revalidateDictionary } from './dictionaries';
 import { getGaddag } from './getGaddag';
 import { type SolverWorkerRequest, type SolverWorkerResponse } from './messages';
+import { solveDraws } from './solveDraws';
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -24,6 +25,10 @@ self.addEventListener('message', ({ data }: MessageEvent<SolverWorkerRequest>) =
     latestSolveId = data.id;
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     respond(data.id, () => handleSolve(data.id, data.payload));
+  } else if (data.type === 'solve-draws') {
+    latestSolveId = data.id;
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    respond(data.id, () => handleSolveDraws(data.id, data.payload));
   } else if (data.type === 'verify') {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     respond(data.id, () => handleVerify(data.id, data.payload));
@@ -50,6 +55,18 @@ async function handleSolve(id: number, payload: SolveRequestPayload): Promise<So
   const config = getConfig(game, locale);
   const tiles = characters.map((character) => new Tile({ character, isBlank: character === BLANK }));
   return { data: solve(gaddag, config, Board.fromJson(board), tiles), id, outcome: 'answered' };
+}
+
+async function handleSolveDraws(id: number, payload: SolveDrawsRequestPayload): Promise<SolverWorkerResponse> {
+  const gaddag = await getGaddag(payload.locale);
+  revalidateInBackground(payload.locale);
+
+  if (!gaddag) {
+    return { id, outcome: 'unavailable' };
+  }
+
+  const data = await solveDraws(gaddag, payload, () => latestSolveId !== id, yieldToQueuedMessages);
+  return data ? { data, id, outcome: 'answered' } : { id, outcome: 'superseded' };
 }
 
 async function handleVerify(

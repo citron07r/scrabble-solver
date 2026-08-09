@@ -1,6 +1,6 @@
 import { Config, Locale } from '@scrabble-solver/types';
 
-import { duplicatEliptic, literaki, scrabble } from '../games';
+import { duplicatCompletiv, duplicatEliptic, literaki, scrabble } from '../games';
 
 const polishTiles = [
   { character: 'a', count: 9, score: 1 },
@@ -86,4 +86,10 @@ export const polishLiteraki = new Config({
     { character: 'ź', count: 1, score: 5 },
     { character: 'ż', count: 1, score: 5 },
   ],
+});
+
+export const polishDuplicatCompletiv = new Config({
+  ...duplicatCompletiv,
+  locale: Locale.PL_PL,
+  tiles: polishTiles,
 });

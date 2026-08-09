@@ -19,6 +19,7 @@ export { localeTransliterate } from './localeTransliterate';
 export { memoize } from './memoize';
 export { noop } from './noop';
 export { numberComparator } from './numberComparator';
+export { pickBestDrawResult } from './pickBestDrawResult';
 export { reverseComparator } from './reverseComparator';
 export { unorderedArraysEqual } from './unorderedArraysEqual';
 export { zipCharactersAndTiles } from './zipCharactersAndTiles';

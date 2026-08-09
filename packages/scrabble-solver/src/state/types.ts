@@ -1,6 +1,7 @@
 import type { BoardState } from './board';
 import type { CellFiltersState } from './cellFilters';
 import type { DictionaryState } from './dictionary';
+import type { DrawsState } from './draws';
 import type { HoveredTileState } from './hoveredTile';
 import type { RackState } from './rack';
 import type { ResultsState } from './results';
@@ -12,6 +13,7 @@ export type RootState = {
   board: BoardState;
   cellFilters: CellFiltersState;
   dictionary: DictionaryState;
+  draws: DrawsState;
   hoveredTile: HoveredTileState;
   rack: RackState;
   results: ResultsState;

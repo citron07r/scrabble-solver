@@ -1,6 +1,6 @@
 import { Config, Locale } from '@scrabble-solver/types';
 
-import { duplicatEliptic, scrabble, superScrabble } from '../games';
+import { duplicatCompletiv, duplicatEliptic, scrabble, superScrabble } from '../games';
 
 /**
  * @see https://frsc1.fortunecity.ws/reg6scr.htm#vallit
@@ -67,6 +67,12 @@ export const romanianSuperScrabble = new Config({
 
 export const romanianDuplicatEliptic = new Config({
   ...duplicatEliptic,
+  locale: Locale.RO_RO,
+  tiles: romanianTiles,
+});
+
+export const romanianDuplicatCompletiv = new Config({
+  ...duplicatCompletiv,
   locale: Locale.RO_RO,
   tiles: romanianTiles,
 });

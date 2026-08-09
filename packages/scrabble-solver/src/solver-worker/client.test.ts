@@ -45,10 +45,13 @@ afterAll(() => {
   Object.assign(globalThis, globals);
 });
 
-const { prefetchDictionary, solveLocally, verifyLocally }: typeof clientModule = await import('./client');
+const { prefetchDictionary, solveDrawsLocally, solveLocally, verifyLocally }: typeof clientModule =
+  await import('./client');
 
 const solvePayload = { board: [], characters: [], game: 'scrabble', locale: 'en-US' } as never;
+const solveDrawsPayload = { board: [], candidates: [], characters: [], game: 'scrabble', locale: 'en-US' } as never;
 const verifyPayload = { board: [], game: 'scrabble', locale: 'en-US' } as never;
+const drawResults = [{ character: 't', isBlank: false, remainingCount: 6, result: null }];
 
 describe('solver worker client', () => {
   beforeEach(() => {
@@ -91,13 +94,54 @@ describe('solver worker client', () => {
     expect(await solve).toBeUndefined();
   });
 
-  it('ignores a late answer to a request that already timed out', async () => {
+  it('discards the worker on timeout, so the next request does not wait one out too', async () => {
+    const terminatedBefore = terminated;
     const solve = solveLocally(solvePayload);
-    const id = lastRequestId();
     timeouts[0]();
-    respond({ data: createResults('ef'), id, outcome: 'answered' });
 
     expect(await solve).toBeUndefined();
+    expect(terminated).toBe(terminatedBefore + 1);
+
+    listeners = [];
+    errorListeners = [];
+    const next = solveLocally(solvePayload);
+    respond({ data: createResults('ij'), id: lastRequestId(), outcome: 'answered' });
+
+    expect(await next).toEqual(createResults('ij'));
+  });
+
+  it('resolves a draw sweep with the worker results', async () => {
+    const draws = solveDrawsLocally(solveDrawsPayload);
+    respond({ data: drawResults, id: lastRequestId(), outcome: 'answered' });
+
+    expect(await draws).toEqual({ data: drawResults, outcome: 'answered' });
+  });
+
+  it('reports a draw sweep as unavailable so the caller falls back to the server', async () => {
+    const draws = solveDrawsLocally(solveDrawsPayload);
+    respond({ id: lastRequestId(), outcome: 'unavailable' });
+
+    expect(await draws).toEqual({ outcome: 'unavailable' });
+  });
+
+  it('reports a superseded draw sweep as cancelled rather than refetching every candidate', async () => {
+    const draws = solveDrawsLocally(solveDrawsPayload);
+    respond({ id: lastRequestId(), outcome: 'superseded' });
+
+    expect(await draws).toEqual({ outcome: 'cancelled' });
+  });
+
+  it('cancels a draw sweep that a newer sweep replaced', async () => {
+    const stale = solveDrawsLocally(solveDrawsPayload);
+    const staleId = lastRequestId();
+    const latest = solveDrawsLocally(solveDrawsPayload);
+    const latestId = lastRequestId();
+
+    respond({ id: staleId, outcome: 'unavailable' });
+    respond({ data: drawResults, id: latestId, outcome: 'answered' });
+
+    expect(await stale).toEqual({ outcome: 'cancelled' });
+    expect(await latest).toEqual({ data: drawResults, outcome: 'answered' });
   });
 
   it('resolves a verify with the worker words', async () => {
