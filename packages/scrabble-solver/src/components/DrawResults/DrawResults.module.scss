@@ -3,6 +3,12 @@
 $row-padding-horizontal: calc(var(--spacing--m) + var(--spacing--s));
 
 .drawResults {
+  /**
+   * The baseline line sits between the header and the list, so the shared
+   * results floor of a header and five rows has to make room for it too.
+   */
+  --results--min-height: calc(7 * var(--results--item--height));
+
   position: relative;
   display: flex;
   flex-direction: column;
@@ -93,17 +99,19 @@ $row-padding-horizontal: calc(var(--spacing--m) + var(--spacing--s));
   height: var(--results--item--height);
   padding-inline: $row-padding-horizontal;
 
+  /**
+   * Below `m` the panel lives in the 370px modal, where the three label-sized
+   * columns leave the word column too narrow to spell out a result. The tighter
+   * gutters buy back the ~25px an eight-letter word needs.
+   */
   @include media('<m') {
     grid-template-columns: 5rem minmax(0, 1fr) 4rem 3.5rem;
+    column-gap: var(--spacing--s);
+    padding-inline: var(--spacing--m);
 
     .coordinates {
       display: none;
     }
-  }
-
-  @include media('<xs') {
-    column-gap: var(--spacing--s);
-    padding-inline: var(--spacing--m);
   }
 }
 

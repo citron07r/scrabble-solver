@@ -109,7 +109,7 @@ The `Deploy` GitHub workflow (`workflow_dispatch` only) SSHs into the production
 
 The app reads/writes user data outside the project directory:
 
-- `$HOME/.scrabble-solver/dictionaries/` — cached serialized `Gaddag`s (binary), one per locale, refreshed when older than 1 day.
+- `$HOME/.scrabble-solver/dictionaries/` — cached serialized `Gaddag`s (binary), one per locale. Entries older than 1 day count as stale, but only `update()` refreshes them; `get()` serves a stale entry as-is.
 - `$HOME/.scrabble-solver/logs/{all,error}.log` — Winston JSON logs.
 
 The `bunx scrabble-solver@latest` entry point (`bin/scrabble-solver.js`) just `cd`s to the package root and runs `bun start`. The app then serves on http://localhost:3333.

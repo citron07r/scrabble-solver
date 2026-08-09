@@ -71,7 +71,7 @@
    * zoom) a fixed dictionary left the list showing a row or two.
    */
   flex: 1 1 0;
-  min-height: calc(6 * var(--results--item--height));
+  min-height: var(--results--min-height, calc(6 * var(--results--item--height)));
   box-shadow: var(--box-shadow);
 }
 
