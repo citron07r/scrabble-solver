@@ -4,7 +4,6 @@ const path = require('path');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 
 module.exports = {
-  compress: false,
   reactStrictMode: true,
   sassOptions: {
     loadPaths: ['./src', path.join(__dirname, '../../node_modules/include-media/dist')],

@@ -1,6 +1,6 @@
 {
   "name": "@scrabble-solver/logger",
-  "version": "2.16.6",
+  "version": "2.17.0",
   "description": "Scrabble Solver 2 - Logger",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -19,7 +19,7 @@
   },
   "homepage": "https://scrabble-solver.org",
   "scripts": {
-    "build": "tsgo --project .",
+    "build": "tsc --project .",
     "clean": "rimraf build/",
     "stats": "node scripts/stats.js"
   },

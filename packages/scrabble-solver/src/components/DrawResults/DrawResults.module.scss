@@ -1,0 +1,229 @@
+@use 'styles/mixins' as *;
+
+$row-padding-horizontal: calc(var(--spacing--m) + var(--spacing--s));
+
+.drawResults {
+  /**
+   * The baseline line sits between the header and the list, so the shared
+   * results floor of a header and five rows has to make room for it too.
+   */
+  --results--min-height: calc(7 * var(--results--item--height));
+
+  container: draw-results / inline-size;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--color--background--element);
+  border: var(--border);
+  border-radius: var(--border--radius);
+}
+
+.emptyState {
+  flex: 1;
+}
+
+.content {
+  flex: 1;
+  position: relative;
+  height: 100%;
+}
+
+.listContainer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.list {
+  @include list-reset;
+  @include scrollbars;
+
+  flex: 1;
+  overflow-y: auto;
+}
+
+.header {
+  position: relative;
+  z-index: 1;
+  text-transform: uppercase;
+  background-color: var(--color--background);
+  border-bottom: var(--border);
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+.baseline {
+  @include ellipsis;
+
+  margin: 0;
+  padding: var(--spacing--s) $row-padding-horizontal;
+  color: var(--color--foreground--secondary);
+  border-bottom: var(--border);
+}
+
+.row {
+  @include button-reset;
+
+  user-select: none;
+  cursor: pointer;
+  font-weight: 400;
+  text-align: start;
+
+  &:focus,
+  &:hover {
+    &:not(:disabled) {
+      background-color: var(--color--primary);
+      color: var(--color--primary--opposite);
+    }
+  }
+
+  &.empty {
+    color: var(--color--inactive);
+    cursor: default;
+  }
+}
+
+/**
+ * Header and rows share one grid definition so their columns cannot drift apart
+ * when a label is wider than the values below it. Declared after .row so the
+ * padding survives button-reset.
+ */
+.header,
+.row {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr) 3.5rem 4.5rem 3.5rem;
+  align-items: center;
+  column-gap: var(--spacing--m);
+  width: 100%;
+  height: var(--results--item--height);
+  padding-inline: $row-padding-horizontal;
+}
+
+/**
+ * Keyed on the panel, not the viewport: this panel is 374px wide inside the
+ * mobile modal but only 330px in the tablet sidebar, so a viewport query would
+ * starve the wider case to protect the narrower one.
+ *
+ * Tight: every column sized to spell out its own label instead of leaving room
+ * for the longest, and coordinates cut to the pin. The bag column is the one
+ * label too long to fit at all ("Dans le sac", "W woreczku"), so it ellipsises;
+ * its value is a one or two digit count that never does.
+ */
+@container draw-results (max-width: 34rem) {
+  .header,
+  .row {
+    grid-template-columns: 4.5rem minmax(0, 1fr) 2rem 4.5rem 3.25rem;
+    column-gap: var(--spacing--s);
+    padding-inline: var(--spacing--m);
+  }
+}
+
+/**
+ * Too narrow for five columns to leave a word legible, so the bag count goes -
+ * the only column describing the bag rather than the move. `Results` thins
+ * itself the same way, down to coordinates, word and points.
+ */
+@container draw-results (max-width: 23rem) {
+  .header,
+  .row {
+    grid-template-columns: 4.5rem minmax(0, 1fr) 2rem 4.5rem;
+    column-gap: var(--spacing--m);
+  }
+
+  /* `.cell` carries the ellipsis mixin's own `display`, so this has to outrank it. */
+  .cell.left {
+    display: none;
+  }
+}
+
+/**
+ * The last width where a label still costs less than it explains. POINTS drops
+ * to the numeric icon `Results` uses for the same column, which frees the 32px
+ * that keeps eight-letter words - SUZERAIN, ZEBRINAS - from truncating here.
+ * The gutter narrows again too: the draw column is sized to its own label, so
+ * that gap is what separates "LETTER 7" from "WORD", but a word left unreadable
+ * costs more than two headers sitting close.
+ */
+@container draw-results (max-width: 20rem) {
+  .header,
+  .row {
+    grid-template-columns: 4.5rem minmax(0, 1fr) 2rem 2.5rem;
+    column-gap: var(--spacing--s);
+  }
+
+  /* Descendant selectors so these outrank the defaults declared further down. */
+  .points .pointsLabel {
+    display: none;
+  }
+
+  .points .pointsIcon {
+    display: inline-block;
+  }
+}
+
+.cell {
+  @include ellipsis;
+
+  min-width: 0;
+}
+
+.draw {
+  display: flex;
+  align-items: center;
+}
+
+.drawTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  padding: 0 var(--spacing--s);
+  font-weight: bold;
+  line-height: 1.5;
+  border: var(--border);
+  border-radius: var(--border--radius);
+}
+
+/** A letter with no copies left in the bag, so it can only arrive as a blank. */
+.blankTile {
+  font-weight: 400;
+  border-style: dashed;
+}
+
+.word {
+  text-transform: uppercase;
+}
+
+.coordinates {
+  text-align: end;
+}
+
+/** Mirrors the pin the Results header uses, so the column reads the same way. */
+.coordinatesIcon,
+.pointsIcon {
+  width: var(--results--icon--size);
+  height: var(--results--icon--size);
+  vertical-align: middle;
+}
+
+/** Only stands in for the label on the narrowest panel; see the container query. */
+.pointsIcon {
+  display: none;
+}
+
+/** Numbers are right-aligned so magnitudes line up when scanning the column. */
+.points {
+  font-weight: bold;
+  text-align: end;
+}
+
+.left {
+  text-align: end;
+}
+
+.solveButton {
+  display: block;
+  margin: var(--spacing--xl) auto 0;
+}

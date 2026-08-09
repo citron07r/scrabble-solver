@@ -1,6 +1,6 @@
 {
   "name": "@scrabble-solver/configs",
-  "version": "2.16.6",
+  "version": "2.17.0",
   "description": "Scrabble Solver 2 - Configs",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -19,12 +19,12 @@
   },
   "homepage": "https://scrabble-solver.org",
   "scripts": {
-    "build": "tsgo --project .",
+    "build": "tsc --project .",
     "clean": "rimraf build/"
   },
   "dependencies": {
-    "@scrabble-solver/constants": "^2.16.6",
-    "@scrabble-solver/types": "^2.16.6"
+    "@scrabble-solver/constants": "^2.17.0",
+    "@scrabble-solver/types": "^2.17.0"
   },
   "gitHead": "1e2d1ad49a288d4a44196d8e3336740da132c637"
 }

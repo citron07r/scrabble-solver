@@ -1,4 +1,4 @@
-import { Board, type BoardJson } from '@scrabble-solver/types';
+import { Board, type BoardJson, Game } from '@scrabble-solver/types';
 import store2 from 'store2';
 
 import type { Rack } from '@/types';
@@ -20,6 +20,21 @@ const LEGACY_KEYS: Record<keyof SettingsState, string> = {
 };
 
 const store = store2.namespace('scrabble-solver');
+
+/**
+ * Best-draw analysis briefly shipped as a "?" marker typed into any game's rack,
+ * then as a game called "best-draw", before settling on Duplicat Completiv. A
+ * persisted marker is no longer a valid character and the old game id no longer
+ * resolves to a config, so both are rewritten on read.
+ *
+ * Introduced in 2.17.1 on 2026/08/09.
+ * Life expectancy: 1y.
+ */
+const LEGACY_UNKNOWN_DRAW = '?';
+
+const LEGACY_GAMES: Record<string, Game> = {
+  'best-draw': Game.DuplicatCompletiv,
+};
 
 /**
  * Introduced in 2.15.26 on 2026/04/27.
@@ -56,7 +71,8 @@ export const localStorage = {
   },
 
   getRack(): Rack | undefined {
-    return store.get(RACK) as Rack | undefined;
+    const rack = store.get(RACK) as Rack | undefined;
+    return rack?.map((character) => (character === LEGACY_UNKNOWN_DRAW ? null : character));
   },
 
   setRack(rack: Rack | undefined): void {
@@ -65,7 +81,9 @@ export const localStorage = {
 
   getSettings(): Partial<SettingsState> {
     const stored = store.get(SETTINGS) as Partial<SettingsState> | undefined;
-    return stored ?? migrateLegacySettings();
+    const settings = stored ?? migrateLegacySettings();
+    const game = settings.game ? LEGACY_GAMES[settings.game] : undefined;
+    return game ? { ...settings, game } : settings;
   },
 
   setSettings(settings: SettingsState): void {

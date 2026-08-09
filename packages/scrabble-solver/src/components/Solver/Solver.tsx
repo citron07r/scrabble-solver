@@ -8,18 +8,21 @@ import { useIsTouchDevice } from '@/hooks';
 import {
   resultsSlice,
   selectAreResultsOutdated,
-  selectProcessedResults,
+  selectIsDuplicatCompletiv,
+  selectNavigableResults,
   selectResultCandidate,
   selectSolveError,
   solveSlice,
   useTranslate,
   useTypedSelector,
+  useTypedStore,
 } from '@/state';
 
 import { Alert } from '../Alert';
 import { Board } from '../Board';
 import { Dictionary } from '../Dictionary';
 import { DictionaryInput } from '../DictionaryInput';
+import { DrawResults } from '../DrawResults';
 import { Rack } from '../Rack';
 import { Results } from '../Results';
 
@@ -37,14 +40,15 @@ const SolverBase: FunctionComponent<Props> = ({ className, onShowResults }) => {
   const isTouchDevice = useIsTouchDevice();
   const { maxControlsWidth, showCompactControls, tileSize } = useAppLayout();
   const error = useTypedSelector(selectSolveError);
+  const isDuplicatCompletiv = useTypedSelector(selectIsDuplicatCompletiv);
   const isOutdated = useTypedSelector(selectAreResultsOutdated);
-  const resultCandidate = useTypedSelector(selectResultCandidate);
-  const results = useTypedSelector(selectProcessedResults);
+  const results = useTypedSelector(selectNavigableResults);
+  const store = useTypedStore();
   const [bestResult] = results || [];
   const touchCallbacks = useMemo(
     () => ({
       onClick: (result: Result) => {
-        const isSelected = result === resultCandidate;
+        const isSelected = result === selectResultCandidate(store.getState());
 
         if (isSelected) {
           dispatch(resultsSlice.actions.applyResult(result));
@@ -53,7 +57,7 @@ const SolverBase: FunctionComponent<Props> = ({ className, onShowResults }) => {
         }
       },
     }),
-    [dispatch, resultCandidate],
+    [dispatch, store],
   );
   const mouseCallbacks = useMemo(
     () => ({
@@ -99,7 +103,11 @@ const SolverBase: FunctionComponent<Props> = ({ className, onShowResults }) => {
           </form>
 
           <div className={styles.column}>
-            <Results callbacks={callbacks} className={styles.results} />
+            {isDuplicatCompletiv ? (
+              <DrawResults callbacks={callbacks} className={styles.results} />
+            ) : (
+              <Results callbacks={callbacks} className={styles.results} />
+            )}
 
             <div data-testid="dictionary" className={styles.dictionaryContainer}>
               <Dictionary className={styles.dictionary} />
