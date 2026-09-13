@@ -1,4 +1,5 @@
 import { type Gaddag } from '@kamilmielnik/gaddag';
+import { logError } from '@scrabble-solver/logger';
 import { type Locale } from '@scrabble-solver/types';
 
 import type { Cache } from '../types';
@@ -55,8 +56,15 @@ export class LayeredCache implements Cache<Locale, Gaddag> {
 
   public async set(locale: Locale, gaddag: Gaddag): Promise<void> {
     const [memoryCache, diskCache] = this.layers;
-    await diskCache.set(locale, gaddag);
     await memoryCache.set(locale, gaddag);
+
+    try {
+      await diskCache.set(locale, gaddag);
+    } catch (error) {
+      // A read-only filesystem (e.g. serverless platforms) must not break solving; the in-memory
+      // cache is already populated, so downgrade the disk-cache failure to a warning.
+      logError('cache', error, { level: 'warn', locale });
+    }
   }
 
   private getLastModifiedLayer(locale: Locale): Cache<Locale, Gaddag> | undefined {

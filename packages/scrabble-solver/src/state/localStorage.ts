@@ -1,4 +1,4 @@
-import { Board, type BoardJson, isObject, type Locale } from '@scrabble-solver/types';
+import { Board, type BoardJson, Game, isObject, type Locale } from '@scrabble-solver/types';
 import store2 from 'store2';
 
 import { englishTranslations } from '@/i18n/i18n';
@@ -53,7 +53,7 @@ export const localStorage = {
       return undefined;
     }
 
-    return rack;
+    return rack?.map((character) => (character === LEGACY_UNKNOWN_DRAW ? null : character));
   },
 
   setRack(rack: Rack | undefined): void {
@@ -67,7 +67,9 @@ export const localStorage = {
       store.remove(SETTINGS);
     }
 
-    return migrateHiddenShowCoordinates(isObject(stored) ? stored : migrateLegacySettings());
+    const settings = migrateHiddenShowCoordinates(isObject(stored) ? stored : migrateLegacySettings());
+    const game = settings.game ? LEGACY_GAMES[settings.game] : undefined;
+    return game ? { ...settings, game } : settings;
   },
 
   setSettings(settings: SettingsState): void {
@@ -103,6 +105,21 @@ export const localStorage = {
 function hasEveryTranslation(translations: Translations): boolean {
   return (Object.keys(englishTranslations) as TranslationKey[]).every((key) => typeof translations[key] === 'string');
 }
+
+/**
+ * Best-draw analysis briefly shipped as a "?" marker typed into any game's rack,
+ * then as a game called "best-draw", before settling on Duplicat Completiv. A
+ * persisted marker is no longer a valid character and the old game id no longer
+ * resolves to a config, so both are rewritten on read.
+ *
+ * Introduced in 2.17.1 on 2026/08/09.
+ * Life expectancy: 1y.
+ */
+const LEGACY_UNKNOWN_DRAW = '?';
+
+const LEGACY_GAMES: Record<string, Game> = {
+  'best-draw': Game.DuplicatCompletiv,
+};
 
 /**
  * Introduced in 2.15.26 on 2026/04/27.

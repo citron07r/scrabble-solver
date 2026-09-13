@@ -2,6 +2,7 @@ import type { AppState } from './app';
 import type { BoardState } from './board';
 import type { CellFiltersState } from './cellFilters';
 import type { DictionaryState } from './dictionary';
+import type { DrawsState } from './draws';
 import type { HoveredTileState } from './hoveredTile';
 import type { HoveredWordState } from './hoveredWord';
 import type { I18nState } from './i18n';
@@ -16,6 +17,7 @@ export type RootState = {
   board: BoardState;
   cellFilters: CellFiltersState;
   dictionary: DictionaryState;
+  draws: DrawsState;
   hoveredTile: HoveredTileState;
   hoveredWord: HoveredWordState;
   i18n: I18nState;

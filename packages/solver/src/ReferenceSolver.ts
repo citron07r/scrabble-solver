@@ -86,6 +86,7 @@ export class ReferenceSolver {
 
   private enumerateSpans(): void {
     const rackTotal = this.rackCounts.reduce((sum, count) => sum + count, this.blanksLeft);
+    const maxPlacements = Math.min(rackTotal, this.config.maximumWordLength);
 
     for (let line = 0; line < this.linesCount; ++line) {
       for (let start = 0; start < this.lineLength; ++start) {
@@ -93,20 +94,20 @@ export class ReferenceSolver {
           this.line = line;
           this.start = start;
           this.end = end;
-          this.trySpan(rackTotal);
+          this.trySpan(maxPlacements);
         }
       }
     }
   }
 
-  private trySpan(rackTotal: number): void {
+  private trySpan(maxPlacements: number): void {
     if (!this.isSpanMaximal()) {
       return;
     }
 
     this.emptyPositions = this.spanPositions().filter((position) => !this.isFilled(position));
 
-    if (this.emptyPositions.length === 0 || this.emptyPositions.length > rackTotal) {
+    if (this.emptyPositions.length === 0 || this.emptyPositions.length > maxPlacements) {
       return;
     }
 
@@ -257,7 +258,7 @@ export class ReferenceSolver {
   }
 
   private applyBingo(wordsScore: number, collisionsScore: number): number {
-    if (this.emptyPositions.length !== this.config.rackSize) {
+    if (this.emptyPositions.length !== this.config.maximumWordLength) {
       return wordsScore + collisionsScore;
     }
 

@@ -56,7 +56,6 @@ export class Dictionaries {
   }
 
   private async updateDictionary(locale: Locale): Promise<Gaddag> {
-    fs.mkdirSync(OUTPUT_DIRECTORY, { recursive: true });
     const downloadDictionaryProxy = this.downloadDictionaryProxies[locale];
     const gaddag = await downloadDictionaryProxy();
     await this.cache.set(locale, gaddag);

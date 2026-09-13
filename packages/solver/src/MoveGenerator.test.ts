@@ -691,6 +691,39 @@ describe('MoveGenerator - bingo', () => {
   });
 });
 
+describe('MoveGenerator - maximum word length', () => {
+  const gaddag = Gaddag.fromArray(['abcd', 'ac']);
+  const board = () =>
+    createBoard(5, 5, [
+      [1, 2, 'a'],
+      [3, 1, 'a'],
+    ]);
+
+  it('never places more tiles than the maximum word length', () => {
+    const config = createConfig(BASIC_TILES, { maximumWordLength: 2, rackSize: 4 });
+    const results = generate(gaddag, config, board(), ['b', 'c', 'd']);
+    expect(toSortedPoints(results)).toEqual([4, 4, 4, 4]);
+  });
+
+  it('applies the bingo at the maximum word length rather than the rack size', () => {
+    const config = createConfig(BASIC_TILES, { maximumWordLength: 3, rackSize: 4 });
+    const results = generate(gaddag, config, board(), ['b', 'c', 'd']);
+    expect(toSortedPoints(results)).toEqual([4, 4, 4, 4, 59, 63]);
+  });
+
+  it('does not apply the bingo below the maximum word length', () => {
+    const config = createConfig(BASIC_TILES, { maximumWordLength: 4, rackSize: 3 });
+    const results = generate(gaddag, config, board(), ['b', 'c', 'd']);
+    expect(toSortedPoints(results)).toEqual([4, 4, 4, 4, 9, 13]);
+  });
+
+  it('matches the reference solver when the maximum word length caps the rack', () => {
+    const config = createConfig(BASIC_TILES, { maximumWordLength: 2, rackSize: 4 });
+    const results = expectMatchesReference(gaddag, config, board(), ['b', 'c', 'd']);
+    expect(results.length).toBeGreaterThan(0);
+  });
+});
+
 describe('MoveGenerator - result ordering', () => {
   it('orders results by direction, line, start, and end like the previous solver', () => {
     const gaddag = Gaddag.fromArray(['ab', 'ba']);

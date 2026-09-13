@@ -1,6 +1,11 @@
 import { type Locale, type ResultJson } from '@scrabble-solver/types';
 
-import { type SolveRequestPayload, type VerifyRequestPayload } from '@/types';
+import {
+  type SolveDrawsRequestPayload,
+  type SolveDrawsResultJson,
+  type SolveRequestPayload,
+  type VerifyRequestPayload,
+} from '@/types';
 
 import { type SolverWorkerRequest, type SolverWorkerResponse, type VerifyResult } from './messages';
 
@@ -17,6 +22,7 @@ interface PendingRequest {
 
 let worker: Worker | undefined;
 let nextId = 0;
+let latestDrawsId = 0;
 let latestSolveId = 0;
 let latestSolve: Promise<ResultJson[] | undefined> = Promise.resolve(undefined);
 const pending = new Map<number, PendingRequest>();
@@ -27,6 +33,37 @@ export function solveLocally(payload: SolveRequestPayload): Promise<ResultJson[]
   latestSolveId = id;
   latestSolve = solve;
   return solve;
+}
+
+/**
+ * Unlike a plain solve, a draw sweep is expensive to redo on the server - one
+ * request per candidate - so the caller has to tell a cancelled sweep (drop it)
+ * apart from one the worker could not answer (fall back).
+ */
+export type LocalDrawsOutcome =
+  | { outcome: 'answered'; data: SolveDrawsResultJson }
+  | { outcome: 'cancelled' }
+  | { outcome: 'unavailable' };
+
+export async function solveDrawsLocally(payload: SolveDrawsRequestPayload): Promise<LocalDrawsOutcome> {
+  const id = ++nextId;
+  latestDrawsId = id;
+  const response = await request({ id, type: 'solve-draws', payload });
+
+  if (response.outcome === 'answered') {
+    return { data: response.data as SolveDrawsResultJson, outcome: 'answered' };
+  }
+
+  /**
+   * A newer request took over - either another sweep or a plain solve. Either
+   * way this sweep's answer is no longer wanted, and redoing it costs a request
+   * per candidate.
+   */
+  if (response.outcome === 'superseded' || id !== latestDrawsId) {
+    return { outcome: 'cancelled' };
+  }
+
+  return { outcome: 'unavailable' };
 }
 
 export async function verifyLocally(payload: VerifyRequestPayload): Promise<VerifyResult | undefined> {
@@ -60,7 +97,9 @@ function request(message: SolverWorkerRequest): Promise<SolverWorkerResponse> {
   }
 
   return new Promise((resolve) => {
-    const timeout = setTimeout(() => settle({ id: message.id, outcome: 'unavailable' }), REQUEST_TIMEOUT);
+    // A worker that missed one deadline will miss the next: discard it rather
+    // than making every later request wait out its own timeout first.
+    const timeout = setTimeout(handleWorkerFailure, REQUEST_TIMEOUT);
     pending.set(message.id, { resolve, timeout });
     targetWorker.postMessage(message);
   });

@@ -125,3 +125,17 @@ describe('getCells', () => {
     ).toBe('abc');
   });
 });
+
+describe('getCells - malformed input', () => {
+  /** This JSON crosses a process boundary, so a bad coordinate must not throw. */
+  it.each([
+    { x: -1, y: 0 },
+    { x: 0, y: -1 },
+    { x: -3, y: -3 },
+  ])('returns no cells for a negative start ($x, $y)', ({ x, y }) => {
+    const board = Board.fromStringArray(['     ', '     ', '     ', '     ', '     ']);
+    expect(
+      getCells(board, { blankIndices: [], id: 0, isHorizontal: true, points: 0, tiles: ['a', 'b'], x, y }),
+    ).toEqual([]);
+  });
+});

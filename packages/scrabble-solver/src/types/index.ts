@@ -1,5 +1,7 @@
 import { type BoardWord, type Result, type ShowCoordinates } from '@scrabble-solver/types';
 
+import { type DrawCandidate } from './api';
+
 export type Comparator<T> = (a: T, B: T) => number;
 
 export type ComparatorFactory<T> = (locale: string, showCoordinates: ShowCoordinates) => Comparator<T>;
@@ -82,6 +84,20 @@ export interface VerifiedWord extends BoardWord {
   isValid: boolean;
 }
 
+export interface DrawResult extends DrawCandidate {
+  results: Result[];
+}
+
+export interface DrawsResult {
+  baseline: Result | null;
+  draws: DrawResult[];
+}
+
+export interface DrawRow extends DrawCandidate {
+  coordinates: string;
+  result: Result | null;
+}
+
 export type TranslationKey =
   | 'cell.enter-word'
   | 'cell.filter-cell.exclude'
@@ -114,6 +130,15 @@ export type TranslationKey =
   | 'dictionary.empty-state.uninitialized'
   | 'dictionary.input.placeholder'
   | 'dictionary.input.title'
+  | 'duplicatCompletiv'
+  | 'duplicatCompletiv.baseline'
+  | 'duplicatCompletiv.blank'
+  | 'duplicatCompletiv.column.draw'
+  | 'duplicatCompletiv.column.left'
+  | 'duplicatCompletiv.empty-state.no-candidates'
+  | 'duplicatCompletiv.empty-state.uninitialized'
+  | 'duplicatCompletiv.empty-state.unsupported'
+  | 'duplicatCompletiv.no-move'
   | 'empty-state.error'
   | 'empty-state.info'
   | 'empty-state.success'

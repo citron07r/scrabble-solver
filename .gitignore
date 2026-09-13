@@ -22,3 +22,7 @@ test-results/
 
 .claude/worktrees
 .claude/settings.local.json
+.ai/
+.idea/
+.junie/
+.vera/

@@ -5,14 +5,14 @@
 
 import { type PayloadAction } from '@reduxjs/toolkit';
 import { hasConfig, languages } from '@scrabble-solver/configs';
-import { Board, Locale, type Result } from '@scrabble-solver/types';
+import { Board, type ConfigJson, Locale, type Result } from '@scrabble-solver/types';
 import { call, delay, put, select, spawn, takeEvery, takeLatest } from 'redux-saga/effects';
 
 import { LOCALE_FEATURES } from '@/i18n/constants';
 import { loadTranslations } from '@/i18n/i18n';
 import { memoize } from '@/lib/memoize';
 import { waitForFirstIntent, waitForIdleOrFirstIntent } from '@/lib/waitForIdleOrFirstIntent';
-import { findWordDefinitions, solve, verify, visit } from '@/sdk';
+import { findWordDefinitions, solve, solveDraws, verify, visit } from '@/sdk';
 import { prefetchDictionary } from '@/solver-worker';
 import { type VerifiedWord } from '@/types';
 
@@ -21,11 +21,13 @@ import { appSlice, selectVersion } from './app';
 import { boardSlice, selectBoard } from './board';
 import { cellFiltersSlice, selectCellFilter } from './cellFilters';
 import { dictionarySlice, selectDictionary } from './dictionary';
+import { drawsSlice } from './draws';
 import { hoveredWordSlice } from './hoveredWord';
 import { i18nSlice, selectLoadedTranslations } from './i18n';
 import { localStorage } from './localStorage';
 import { rackSlice, selectCharacters, selectRack } from './rack';
 import { resultsSlice } from './results';
+import { selectDrawCandidates, selectIsDuplicatCompletiv } from './selectors';
 import {
   selectConfig,
   selectGame,
@@ -102,6 +104,7 @@ function* onGameChange(): AnyGenerator {
     yield put(resultsSlice.actions.reset());
   }
 
+  yield put(drawsSlice.actions.reset());
   yield put(resultsSlice.actions.reset());
   yield put(hoveredWordSlice.actions.clear());
   yield* resetRack();
@@ -149,8 +152,11 @@ function* onInitialize({ payload }: PayloadAction<{ version: string }>): AnyGene
   yield spawn(preloadTranslationsWhenIdle);
   yield spawn(visitWhenIdle);
 
+  // Unconditional: a rack persisted under a different game keeps that game's
+  // length, which would leave Duplicat Completiv holding more than its six fixed tiles.
+  yield* resetRack();
+
   if (!board.isEmpty()) {
-    yield* resetRack();
     yield put(verifySlice.actions.submit());
   }
 }
@@ -262,7 +268,11 @@ function* onReset(): AnyGenerator {
   yield put(cellFiltersSlice.actions.reset());
   yield put(dictionarySlice.actions.reset());
   yield put(hoveredWordSlice.actions.clear());
+  yield put(drawsSlice.actions.reset());
   yield put(rackSlice.actions.reset());
+  // rackDefaultState is fixed at module load from the game that was persisted
+  // then, so it can be the wrong length for the game selected now.
+  yield* resetRack();
   yield put(resultsSlice.actions.reset());
   yield put(solveSlice.actions.reset());
   yield put(verifySlice.actions.submit());
@@ -293,6 +303,7 @@ function* onLocaleChange({ payload: locale }: PayloadAction<Locale>): AnyGenerat
 
   yield put(dictionarySlice.actions.reset());
   yield put(hoveredWordSlice.actions.clear());
+  yield put(drawsSlice.actions.reset());
   yield put(resultsSlice.actions.changeResultCandidate(null));
   yield put(verifySlice.actions.submit());
 }
@@ -337,6 +348,14 @@ function* onSolve(): AnyGenerator {
   const { config } = yield select(selectConfig);
   const locale = yield select(selectLocale);
   const characters = yield select(selectCharacters);
+  const isDuplicatCompletiv = yield select(selectIsDuplicatCompletiv);
+
+  if (isDuplicatCompletiv) {
+    yield* solveDrawsForRack(board, config, locale, characters);
+    return;
+  }
+
+  yield put(drawsSlice.actions.reset());
 
   if (characters.length === 0) {
     yield put(solveSlice.actions.submitSuccess({ board, characters }));
@@ -355,6 +374,42 @@ function* onSolve(): AnyGenerator {
     yield put(solveSlice.actions.submitSuccess({ board, characters }));
   } catch (error) {
     yield put(resultsSlice.actions.changeResults([]));
+    yield put(solveSlice.actions.submitFailure(error));
+  }
+}
+
+/**
+ * The rack holds an unknown-draw marker, so instead of one solve there is one
+ * per tile still in the bag. Results land in their own slice - the plain results
+ * list has no column for "which draw made this possible".
+ */
+function* solveDrawsForRack(board: Board, config: ConfigJson, locale: Locale, characters: string[]): AnyGenerator {
+  const candidates = yield select(selectDrawCandidates);
+
+  yield put(resultsSlice.actions.changeResults([]));
+
+  if (candidates.length === 0) {
+    yield put(drawsSlice.actions.changeResults({ baseline: null, draws: [] }));
+    yield put(solveSlice.actions.submitSuccess({ board, characters }));
+    return;
+  }
+
+  try {
+    const drawsResult = yield call(solveDraws, {
+      board: board.toJson(),
+      candidates,
+      characters,
+      game: config.game,
+      locale,
+    });
+
+    // A newer sweep took over; it owns the results now.
+    if (drawsResult) {
+      yield put(drawsSlice.actions.changeResults(drawsResult));
+      yield put(solveSlice.actions.submitSuccess({ board, characters }));
+    }
+  } catch (error) {
+    yield put(drawsSlice.actions.reset());
     yield put(solveSlice.actions.submitFailure(error));
   }
 }

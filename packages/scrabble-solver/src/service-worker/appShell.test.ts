@@ -66,7 +66,8 @@ describe('respondToNavigation', () => {
 });
 
 function navigation(url: string): Request {
-  return new Request(new URL(url, 'https://scrabble-solver.org'));
+  // Inert origin: a test must not be able to address production if the helper changes.
+  return new Request(new URL(url, 'https://example.test'));
 }
 
 function html(body: string): Response {

@@ -58,17 +58,20 @@
 ## Table of contents
 
 1. [Dictionaries](#dictionaries)
-2. [Run](#run)
-3. [Uninstall](#uninstall)
-4. [Develop](#develop)
+2. [Game modes](#game-modes)
+   1. [Duplicat Eliptic](#duplicat-eliptic)
+   2. [Duplicat Completiv](#duplicat-completiv)
+3. [Run](#run)
+4. [Uninstall](#uninstall)
+5. [Develop](#develop)
    1. [Setup](#setup)
    2. [Run app dev server](#run-app-dev-server)
    3. [Rebuild the entire project](#rebuild-the-entire-project)
    4. [Rebuild a single package](#rebuild-a-single-package)
    5. [Add a new language](#add-a-new-language)
-5. [Tech stack](#tech-stack)
-6. [Related projects](#related-projects)
-7. [Media](#media)
+6. [Tech stack](#tech-stack)
+7. [Related projects](#related-projects)
+8. [Media](#media)
 
 ## Dictionaries
 
@@ -85,6 +88,45 @@ Some of the word lists below are sourced from the companion repository [kamilmie
 | 🇷🇴 Romanian | [💾](https://dexonline.ro/static/download/scrabble/loc-flexiuni-5.0.zip) [LOC 5](https://dexonline.ro/scrabble)                                                                                         | [dexonline](https://dexonline.ro/)                   | luxemburghezele (1944)                                                                                       |
 | 🇪🇸 Spanish  | [💾](https://github.com/kamilmielnik/scrabble-dictionaries/blob/master/spanish/file-2017.txt) [FILE 2017](https://www.facebook.com/Escrablistica)                                                       | [Diccionarios.com](https://www.diccionarios.com/)    | flexibilizabais (1323)                                                                                       |
 | 🇹🇷 Turkish  | [💾](https://github.com/kamilmielnik/scrabble-dictionaries/blob/master/turkish/kelimelik.txt) Kelimelik                                                                                                 | [Türk Dil Kurumu Sözlükleri](https://sozluk.gov.tr/) | peygamberdevesi (1323)                                                                                       |
+
+## Game modes
+
+Beyond the standard games, the solver supports two Romanian-federation-style analysis modes. Both are available in every language.
+
+### Duplicat Eliptic
+
+*Duplicat Eliptic* (Elliptic Duplicate Scrabble) is a tournament discipline of the Romanian Scrabble Federation (*Federația Română de Scrabble*). It is played under duplicate rules — every player competes simultaneously on their own board with the same letters, so tile-draw luck is eliminated — with one asymmetric constraint that makes it far harder than standard Scrabble.
+
+Rules, as modelled by the solver:
+
+- The rack holds **8 tiles** instead of 7.
+- A move may place **at most 7 tiles** from the rack. The 8th is always left over.
+- The word itself is **not** limited to 7 letters — it can be longer by running through tiles already on the board. Only the number of tiles taken from the rack is capped.
+- The **bingo bonus is awarded at 7 placed tiles**, not at a full rack.
+- Board size, premium squares, and tile distribution are the standard ones for the chosen language.
+
+Select it from the game dropdown. In config terms this is `rackSize: 8` with `maximumWordLength: 7` (`packages/configs/src/games/duplicatEliptic.ts`); `maximumWordLength` defaults to `rackSize`, so every other game is unaffected.
+
+The round structure of a real tournament — the referee announcing 8 letters, players submitting a *fluturaș* slip, the top play being placed on every board, unused letters carrying over — is outside the scope of this tool. The solver answers the single question a player faces in those 3 minutes: what is the best legal move?
+
+### Duplicat Completiv
+
+Answers a different question: *I hold six tiles and will draw a seventh — which draw is best?* Useful for study, and for the carry-over phase of duplicate play.
+
+Select **Duplicat Completiv** from the game list. Its rack holds **six** tiles — the fixed ones you already have. The seventh is never typed: the solver supplies it from the bag, once per tile that could still come out, and ranks the results.
+
+Rules:
+
+- Every tile **still in the bag** is a candidate. The bag is the full distribution minus the tiles on the board and the six on your rack.
+- Each row shows the **highest-scoring legal move that actually places the drawn tile**. A move your six fixed tiles already afford is not attributed to the draw.
+- If a **blank is still in the bag**, letters with no copies left are also offered — played by that blank for **0 points**. Those rows are marked with a dashed tile.
+- If **no blank is left**, letters with no copies left are dropped entirely.
+- Word length is unbounded and at most 7 tiles are placed, so a move can run through board tiles to form a longer word. Normal Scrabble scoring applies, and the bingo lands at 7 placed tiles.
+- A baseline line above the table shows the best move without any draw, so each row's gain is readable.
+
+The interesting result is that the best draw is often not the highest-value tile: a 0-point blank standing in for a missing letter can open a bingo and beat a Q.
+
+Solving runs in a Web Worker when the dictionary is cached locally (roughly 30 solves, a few dozen milliseconds), and falls back to the server otherwise.
 
 ## Run
 

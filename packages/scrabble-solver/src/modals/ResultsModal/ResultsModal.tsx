@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 
 import { Button } from '@/components/Button';
 import { Dictionary } from '@/components/Dictionary';
+import { DrawResults } from '@/components/DrawResults';
 import { Modal } from '@/components/Modal';
 import { Results } from '@/components/Results';
 import { useIsTouchDevice } from '@/hooks/useIsTouchDevice';
@@ -12,6 +13,7 @@ import Check from '@/icons/Check.svg';
 import EyeFill from '@/icons/EyeFill.svg';
 import {
   resultsSlice,
+  selectIsDuplicatCompletiv,
   selectResultCandidate,
   selectResultCandidateIndex,
   useTranslate,
@@ -31,6 +33,7 @@ const ResultsModalBase: FunctionComponent<Props> = ({ className, isOpen, onClose
   const translate = useTranslate();
   const showResultsInModal = useMediaQuery('<l');
   const previewsOnRepeatedClick = useIsTouchDevice();
+  const isDuplicatCompletiv = useTypedSelector(selectIsDuplicatCompletiv);
   const resultCandidate = useTypedSelector(selectResultCandidate);
   const highlightedIndex = useTypedSelector(selectResultCandidateIndex);
 
@@ -93,11 +96,15 @@ const ResultsModalBase: FunctionComponent<Props> = ({ className, isOpen, onClose
         </>
       }
       isOpen={isOpen}
-      title={translate('results')}
+      title={translate(isDuplicatCompletiv ? 'duplicatCompletiv' : 'results')}
       onClose={onClose}
     >
       <div className={styles.content}>
-        <Results callbacks={callbacks} className={styles.results} highlightedIndex={highlightedIndex} />
+        {isDuplicatCompletiv ? (
+          <DrawResults callbacks={callbacks} className={styles.results} />
+        ) : (
+          <Results callbacks={callbacks} className={styles.results} highlightedIndex={highlightedIndex} />
+        )}
         <Dictionary className={styles.dictionary} />
       </div>
     </Modal>

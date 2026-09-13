@@ -1,1 +1,1 @@
-export { prefetchDictionary, solveLocally, verifyLocally } from './client';
+export { type LocalDrawsOutcome, prefetchDictionary, solveDrawsLocally, solveLocally, verifyLocally } from './client';
