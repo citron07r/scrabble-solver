@@ -82,4 +82,21 @@ describe('DiskCache', () => {
 
     expect(cache.isStale(LOCALE)).toBe(true);
   });
+
+  it('creates the cache directory on set when it does not exist yet', async () => {
+    const freshDirectory = path.join(directory, 'nested', 'subdir');
+    const freshCache = new DiskCache(freshDirectory);
+
+    expect(fs.existsSync(freshDirectory)).toBe(false);
+
+    await freshCache.set(LOCALE, Gaddag.fromArray(WORDS));
+
+    expect(fs.existsSync(freshDirectory)).toBe(true);
+
+    const gaddag = await freshCache.get(LOCALE);
+
+    for (const word of WORDS) {
+      expect(gaddag?.has(word)).toBe(true);
+    }
+  });
 });
