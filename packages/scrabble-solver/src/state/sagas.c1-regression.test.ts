@@ -57,7 +57,29 @@ const createTestStore = () => {
   return store;
 };
 
-const flushMicrotasks = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+/**
+ * Polls until the store's state stops changing between two ticks instead of
+ * waiting a fixed duration - a blind `setTimeout` flush could assert before
+ * an in-flight saga (e.g. a forked `onSolve`) has finished dispatching.
+ */
+const flushSagas = async (store: ReturnType<typeof createTestStore>, maxTicks = 20): Promise<void> => {
+  let previous = JSON.stringify(store.getState());
+
+  for (let tick = 0; tick < maxTicks; tick += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+    const next = JSON.stringify(store.getState());
+
+    if (next === previous) {
+      return;
+    }
+
+    previous = next;
+  }
+
+  throw new Error('flushSagas: store state did not stabilize within the tick budget');
+};
 
 describe('sagas - C1 regression: drawsSlice.actions.reset() ordering', () => {
   it('does not clobber freshly-solved draws results when changing the game (zero-candidates sync path)', async () => {
@@ -66,7 +88,7 @@ describe('sagas - C1 regression: drawsSlice.actions.reset() ordering', () => {
     store.dispatch(rackSlice.actions.changeCharacters({ characters: ['c', 'a', 't'], index: 0 }));
     store.dispatch(settingsSlice.actions.changeGame(Game.DuplicatCompletiv));
 
-    await flushMicrotasks();
+    await flushSagas(store);
 
     expect(store.getState().draws.results).toBeDefined();
   });
@@ -76,10 +98,16 @@ describe('sagas - C1 regression: drawsSlice.actions.reset() ordering', () => {
 
     store.dispatch(rackSlice.actions.changeCharacters({ characters: ['c', 'a', 't'], index: 0 }));
     store.dispatch(settingsSlice.actions.changeGame(Game.DuplicatCompletiv));
-    await flushMicrotasks();
+    await flushSagas(store);
+
+    // Prove the final assertion is driven by the locale-change path itself,
+    // not leftover state from the changeGame dispatch above.
+    store.dispatch(drawsSlice.actions.reset());
+
+    expect(store.getState().draws.results).toBeUndefined();
 
     store.dispatch(settingsSlice.actions.changeLocale(Locale.EN_GB));
-    await flushMicrotasks();
+    await flushSagas(store);
 
     expect(store.getState().draws.results).toBeDefined();
   });
