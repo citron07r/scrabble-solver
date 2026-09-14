@@ -49,8 +49,10 @@ describe('getGaddag', () => {
   it('still resolves when the cleanup deletion rejects', async () => {
     dictionary = new Response(Gaddag.fromArray(['scrabble']).serialize().subarray(0, 10));
     deleteDictionaryError = new Error('Could not delete dictionary');
+    const deletedCount = deletedLocales.length;
 
     expect(await getGaddag(Locale.FA_IR)).toBeUndefined();
+    expect(deletedLocales.slice(deletedCount)).toEqual([Locale.FA_IR]);
 
     deleteDictionaryError = undefined;
   });

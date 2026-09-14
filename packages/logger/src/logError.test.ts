@@ -4,7 +4,11 @@ describe('shouldMirrorToConsole', () => {
   const originalVercel = process.env.VERCEL;
 
   afterEach(() => {
-    process.env.VERCEL = originalVercel;
+    if (typeof originalVercel === 'undefined') {
+      delete process.env.VERCEL;
+    } else {
+      process.env.VERCEL = originalVercel;
+    }
   });
 
   it('mirrors a warn-level event on Vercel', () => {
