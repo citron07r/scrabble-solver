@@ -71,7 +71,14 @@ const solveOnServer = async (payload: SolveDrawsRequestPayload): Promise<Map<str
   const worker = async (): Promise<void> => {
     while (nextIndex < drawnCharacters.length) {
       const drawnCharacter = drawnCharacters[nextIndex++];
-      resultsByCharacter.set(drawnCharacter, await fetchSolve(payload, drawnCharacter));
+
+      try {
+        resultsByCharacter.set(drawnCharacter, await fetchSolve(payload, drawnCharacter));
+      } catch (error) {
+        // One bad response shouldn't discard every other candidate's already-resolved results.
+        console.error(`Failed to solve for drawn character "${drawnCharacter}":`, error);
+        resultsByCharacter.set(drawnCharacter, []);
+      }
     }
   };
 

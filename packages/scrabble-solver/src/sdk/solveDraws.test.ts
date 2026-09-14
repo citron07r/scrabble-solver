@@ -138,4 +138,26 @@ describe('solveDraws (sdk)', () => {
     expect(fetchCalls).toHaveLength(0);
     expect(result?.baseline).toBeNull();
   });
+
+  it("degrades one candidate's request failure to empty results instead of discarding the whole sweep", async () => {
+    respondWith = (characters) => {
+      const drawn = characters[characters.length - 1];
+
+      if (drawn === 'x') {
+        throw new Error('simulated network failure');
+      }
+
+      return characters.length === 1 ? [] : [createResultJson(['a', drawn], 10)];
+    };
+
+    const result: DrawsResult | undefined = await solveDraws(
+      createPayload({ candidates: [candidate('x'), candidate('y')] }),
+    );
+
+    expect(result).toBeDefined();
+
+    const [xDraw, yDraw] = result?.draws ?? [];
+    expect(xDraw.results).toEqual([]);
+    expect(yDraw.results.map((yResult) => yResult.points)).toEqual([10]);
+  });
 });

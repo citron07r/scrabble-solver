@@ -98,13 +98,14 @@ function* onApplyResult({ payload: result }: PayloadAction<Result>): AnyGenerato
 function* onGameChange(): AnyGenerator {
   const characters = yield select(selectCharacters);
 
+  yield put(drawsSlice.actions.reset());
+
   if (characters.length > 0) {
     yield put(solveSlice.actions.submit());
   } else {
     yield put(resultsSlice.actions.reset());
   }
 
-  yield put(drawsSlice.actions.reset());
   yield put(resultsSlice.actions.reset());
   yield put(hoveredWordSlice.actions.clear());
   yield* resetRack();
@@ -295,6 +296,8 @@ function* onLocaleChange({ payload: locale }: PayloadAction<Locale>): AnyGenerat
 
   const characters = yield select(selectCharacters);
 
+  yield put(drawsSlice.actions.reset());
+
   if (characters.length > 0) {
     yield put(solveSlice.actions.submit());
   } else {
@@ -303,7 +306,6 @@ function* onLocaleChange({ payload: locale }: PayloadAction<Locale>): AnyGenerat
 
   yield put(dictionarySlice.actions.reset());
   yield put(hoveredWordSlice.actions.clear());
-  yield put(drawsSlice.actions.reset());
   yield put(resultsSlice.actions.changeResultCandidate(null));
   yield put(verifySlice.actions.submit());
 }
