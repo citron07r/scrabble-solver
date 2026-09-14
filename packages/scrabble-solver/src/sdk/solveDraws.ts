@@ -2,6 +2,7 @@ import { BLANK } from '@scrabble-solver/constants';
 import { Board, Result, type ResultJson } from '@scrabble-solver/types';
 
 import { pickBestDrawResults } from '@/lib/pickBestDrawResults';
+import { pickHighestScoring } from '@/lib/pickHighestScoring';
 import { solveDrawsLocally } from '@/solver-worker';
 import { type DrawCandidate, type DrawsResult, type SolveDrawsRequestPayload } from '@/types';
 
@@ -70,7 +71,14 @@ const solveOnServer = async (payload: SolveDrawsRequestPayload): Promise<Map<str
   const worker = async (): Promise<void> => {
     while (nextIndex < drawnCharacters.length) {
       const drawnCharacter = drawnCharacters[nextIndex++];
-      resultsByCharacter.set(drawnCharacter, await fetchSolve(payload, drawnCharacter));
+
+      try {
+        resultsByCharacter.set(drawnCharacter, await fetchSolve(payload, drawnCharacter));
+      } catch (error) {
+        // One bad response shouldn't discard every other candidate's already-resolved results.
+        console.error(`Failed to solve for drawn character "${drawnCharacter}":`, error);
+        resultsByCharacter.set(drawnCharacter, []);
+      }
     }
   };
 
@@ -93,18 +101,6 @@ const fetchSolve = (
     method: 'POST',
     body: JSON.stringify({ board, characters: drawnCharacters, game, locale }),
   });
-};
-
-const pickHighestScoring = (results: ResultJson[]): ResultJson | null => {
-  let best: ResultJson | null = null;
-
-  for (const result of results) {
-    if (!best || result.points > best.points) {
-      best = result;
-    }
-  }
-
-  return best;
 };
 
 const toResult = (json: ResultJson | null, board: Board): Result | null => {

@@ -89,77 +89,110 @@ $row-padding-horizontal: calc(var(--spacing--m) + var(--spacing--s));
  * Header and rows share one grid definition so their columns cannot drift apart
  * when a label is wider than the values below it. Declared after .row so the
  * padding survives button-reset.
+ *
+ * Keyed on the panel, not the viewport: this panel is 374px wide inside the
+ * mobile modal but only 330px in the tablet sidebar, so a viewport query would
+ * starve the wider case to protect the narrower one. Container queries (the
+ * `@container draw-results (min-width: ...)` blocks below) are what key it to
+ * the panel - but this package's browserslist still declares support down to
+ * Safari 15.4 / iOS Safari 15.4 (container queries shipped in Safari 16.0) and
+ * Firefox 100 / Chrome 100 (container queries shipped Firefox 110 / Chrome
+ * 105). A browser in that gap ignores every `@container` block below and is
+ * left with whatever this bare rule says, so this bare rule has to be the
+ * tightest, narrowest-safe tier - what this panel actually needs at its
+ * smallest real size (~330-374px) - rather than the widest one. The
+ * `@container` blocks below only ever widen the layout back out from here, for
+ * containers that report a size and can prove they have the room to spare.
+ *
+ * Tight: every column sized to spell out its own label instead of leaving room
+ * for the longest, and coordinates cut to the pin. The bag column is the one
+ * that doesn't fit at all at this width, so it's dropped (see `.cell.left`
+ * below) instead of left to ellipsise down to nothing. POINTS drops to the
+ * numeric icon `Results` uses for the same column, which frees the 32px that
+ * keeps eight-letter words - SUZERAIN, ZEBRINAS - from truncating here.
  */
 .header,
 .row {
   display: grid;
-  grid-template-columns: 5rem minmax(0, 1fr) 3.5rem 4.5rem 3.5rem;
+  grid-template-columns: 4.5rem minmax(0, 1fr) 2rem 2.5rem;
   align-items: center;
-  column-gap: var(--spacing--m);
+  column-gap: var(--spacing--s);
   width: 100%;
   height: var(--results--item--height);
-  padding-inline: $row-padding-horizontal;
+  padding-inline: var(--spacing--m);
+}
+
+/* `.cell` carries the ellipsis mixin's own `display`, so this has to outrank it. */
+.cell.left {
+  display: none;
+}
+
+/* Descendant selectors so these outrank the defaults declared further down. */
+.points .pointsLabel {
+  display: none;
+}
+
+.points .pointsIcon {
+  display: inline-block;
 }
 
 /**
- * Keyed on the panel, not the viewport: this panel is 374px wide inside the
- * mobile modal but only 330px in the tablet sidebar, so a viewport query would
- * starve the wider case to protect the narrower one.
- *
- * Tight: every column sized to spell out its own label instead of leaving room
- * for the longest, and coordinates cut to the pin. The bag column is the one
- * label too long to fit at all ("Dans le sac", "W woreczku"), so it ellipsises;
- * its value is a one or two digit count that never does.
+ * The three breakpoints below mirror the three tiers a container-query-
+ * supporting browser used to reach via descending `max-width` queries from a
+ * wide base, just walked in the opposite direction now that the bare rule
+ * above is the narrowest tier. Each `min-width` starts a fraction of a pixel
+ * past its old `max-width` counterpart (the same +0.02px convention Bootstrap
+ * uses between adjacent breakpoints) so a container at exactly, say, 20rem
+ * still gets the narrower tier and no width falls between two non-matching
+ * queries. Together these three blocks reproduce, tier for tier, exactly what
+ * this file rendered before this restructuring in every browser that
+ * evaluates `@container` at all - only the fallback tier (the bare rule above,
+ * for browsers that don't) changed.
  */
-@container draw-results (max-width: 34rem) {
-  .header,
-  .row {
-    grid-template-columns: 4.5rem minmax(0, 1fr) 2rem 4.5rem 3.25rem;
-    column-gap: var(--spacing--s);
-    padding-inline: var(--spacing--m);
-  }
-}
-
-/**
- * Too narrow for five columns to leave a word legible, so the bag count goes -
- * the only column describing the bag rather than the move. `Results` thins
- * itself the same way, down to coordinates, word and points.
- */
-@container draw-results (max-width: 23rem) {
+@container draw-results (min-width: calc(20rem + 0.02px)) {
   .header,
   .row {
     grid-template-columns: 4.5rem minmax(0, 1fr) 2rem 4.5rem;
     column-gap: var(--spacing--m);
   }
 
-  /* `.cell` carries the ellipsis mixin's own `display`, so this has to outrank it. */
-  .cell.left {
+  /* Undo the icon swap above: there's room for the POINTS label again. */
+  .points .pointsLabel {
+    display: block;
+  }
+
+  .points .pointsIcon {
     display: none;
   }
 }
 
 /**
- * The last width where a label still costs less than it explains. POINTS drops
- * to the numeric icon `Results` uses for the same column, which frees the 32px
- * that keeps eight-letter words - SUZERAIN, ZEBRINAS - from truncating here.
- * The gutter narrows again too: the draw column is sized to its own label, so
- * that gap is what separates "LETTER 7" from "WORD", but a word left unreadable
- * costs more than two headers sitting close.
+ * Wide enough for five columns to leave a word legible again, so the bag count
+ * (the only column describing the bag rather than the move) comes back.
  */
-@container draw-results (max-width: 20rem) {
+@container draw-results (min-width: calc(23rem + 0.02px)) {
   .header,
   .row {
-    grid-template-columns: 4.5rem minmax(0, 1fr) 2rem 2.5rem;
+    grid-template-columns: 4.5rem minmax(0, 1fr) 2rem 4.5rem 3.25rem;
     column-gap: var(--spacing--s);
+    padding-inline: var(--spacing--m);
   }
 
-  /* Descendant selectors so these outrank the defaults declared further down. */
-  .points .pointsLabel {
-    display: none;
+  .cell.left {
+    display: block;
   }
+}
 
-  .points .pointsIcon {
-    display: inline-block;
+/**
+ * Roomiest tier: every column sized to leave space for the longest label
+ * instead of just its own.
+ */
+@container draw-results (min-width: calc(34rem + 0.02px)) {
+  .header,
+  .row {
+    grid-template-columns: 5rem minmax(0, 1fr) 3.5rem 4.5rem 3.5rem;
+    column-gap: var(--spacing--m);
+    padding-inline: $row-padding-horizontal;
   }
 }
 
