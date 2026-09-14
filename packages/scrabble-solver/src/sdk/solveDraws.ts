@@ -2,6 +2,7 @@ import { BLANK } from '@scrabble-solver/constants';
 import { Board, Result, type ResultJson } from '@scrabble-solver/types';
 
 import { pickBestDrawResults } from '@/lib/pickBestDrawResults';
+import { pickHighestScoring } from '@/lib/pickHighestScoring';
 import { solveDrawsLocally } from '@/solver-worker';
 import { type DrawCandidate, type DrawsResult, type SolveDrawsRequestPayload } from '@/types';
 
@@ -93,18 +94,6 @@ const fetchSolve = (
     method: 'POST',
     body: JSON.stringify({ board, characters: drawnCharacters, game, locale }),
   });
-};
-
-const pickHighestScoring = (results: ResultJson[]): ResultJson | null => {
-  let best: ResultJson | null = null;
-
-  for (const result of results) {
-    if (!best || result.points > best.points) {
-      best = result;
-    }
-  }
-
-  return best;
 };
 
 const toResult = (json: ResultJson | null, board: Board): Result | null => {

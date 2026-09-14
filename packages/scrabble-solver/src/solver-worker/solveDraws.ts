@@ -5,6 +5,7 @@ import { solve } from '@scrabble-solver/solver';
 import { Board, type ResultJson, Tile } from '@scrabble-solver/types';
 
 import { pickBestDrawResults } from '@/lib/pickBestDrawResults';
+import { pickHighestScoring } from '@/lib/pickHighestScoring';
 import { type DrawResultJson, type SolveDrawsRequestPayload, type SolveDrawsResultJson } from '@/types';
 
 /**
@@ -53,16 +54,4 @@ export const solveDraws = async (
 
 const toTiles = (characters: string[]): Tile[] => {
   return characters.map((character) => new Tile({ character, isBlank: character === BLANK }));
-};
-
-const pickHighestScoring = (results: ResultJson[]): ResultJson | null => {
-  let best: ResultJson | null = null;
-
-  for (const result of results) {
-    if (!best || result.points > best.points) {
-      best = result;
-    }
-  }
-
-  return best;
 };
